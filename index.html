@@ -661,6 +661,7 @@
     // --- ESTADO DA APLICAÇÃO ---
     let sales = [];
     let drivers = [];
+    let deletedIds = [];
     let currentTab = 'list';
     let editingId = null;
     let currentFichaSaleId = null;
@@ -696,6 +697,7 @@
 
     // --- INICIALIZAÇÃO ---
     window.onload = function() {
+      loadDeletedIdsFromStorage();
       loadDriversFromStorage();
       loadGpsRoutesFromStorage();
       loadSalesFromStorage();
@@ -719,10 +721,26 @@
     };
 
     // --- ARMAZENAMENTO LOCAL ---
+    function loadDeletedIdsFromStorage() {
+      const saved = localStorage.getItem('app_vendas_deleted_ids');
+      if (saved) {
+        try { deletedIds = JSON.parse(saved); } catch (e) { deletedIds = []; }
+      }
+    }
+
+    function saveDeletedIdsToStorage() {
+      localStorage.setItem('app_vendas_deleted_ids', JSON.stringify(deletedIds));
+    }
+
     function loadSalesFromStorage() {
       const saved = localStorage.getItem('app_vendas_data');
       if (saved) {
-        try { sales = JSON.parse(saved); } catch (e) { sales = []; }
+        try { 
+          sales = JSON.parse(saved); 
+          if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+            sales = sales.filter(s => !deletedIds.includes(s.id));
+          }
+        } catch (e) { sales = []; }
       }
     }
 
@@ -1095,9 +1113,17 @@
         }
 
         const mergedMap = new Map();
-        sales.forEach(s => mergedMap.set(s.id, s));
+        
+        // Adiciona vendas locais ignorando as apagadas
+        sales.forEach(s => {
+          if (!deletedIds.includes(s.id)) {
+            mergedMap.set(s.id, s);
+          }
+        });
+
+        // Adiciona vendas remotas apenas se não estiverem na lista de excluídos
         remoteSales.forEach(s => {
-          if (!mergedMap.has(s.id)) {
+          if (!deletedIds.includes(s.id) && !mergedMap.has(s.id)) {
             mergedMap.set(s.id, s);
           }
         });
@@ -1492,6 +1518,11 @@
     }
 
     async function deleteSale(id) {
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        saveDeletedIdsToStorage();
+      }
+
       sales = sales.filter(s => s.id !== id);
       saveSalesToStorage();
       renderSales();
@@ -1503,6 +1534,11 @@
     }
 
     function clearAllSales() {
+      sales.forEach(s => {
+        if (!deletedIds.includes(s.id)) deletedIds.push(s.id);
+      });
+      saveDeletedIdsToStorage();
+
       sales = [];
       localStorage.removeItem('app_vendas_data');
       renderSales();
