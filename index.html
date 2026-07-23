@@ -107,7 +107,7 @@
   </header>
 
   <!-- Conteúdo Principal -->
-  <main class="max-w-4xl mx-auto px-4 py-5">
+  <main class="max-w-4xl mx-auto px-2 sm:px-4 py-3 sm:py-5">
     
     <!-- Cards de Resumo -->
     <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-5">
@@ -186,7 +186,7 @@
       <!-- PAINEL DE VENDAS AGRUPADAS POR MOTORISTA -->
       <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
         <div>
-          <h2 class="text-base font-bold text-slate-800">Vendas por Motorista</h2>
+          <h2 class="text-base font-bold text-slate-800">🛵 / 🚗 Vendas por Motorista</h2>
           <p class="text-xs text-slate-500">Acompanhe as entregas delegadas a cada profissional e seu veículo.</p>
         </div>
         <button onclick="openDriverModal()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition shadow-sm">
@@ -201,7 +201,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div>
             <h2 class="text-base font-bold text-slate-800 flex items-center gap-1.5">
-               Mapa de Entregas & Rota GPS em Tempo Real
+              <span>📍</span> Mapa de Entregas & Rota GPS em Tempo Real
             </h2>
             <p class="text-xs text-slate-500">Veja os pings dos pedidos no mapa e rastreie o percurso do motorista.</p>
           </div>
@@ -224,7 +224,7 @@
                 <span>🟢</span> Iniciar GPS
               </button>
               <button id="btn-reset-gps" onclick="resetCurrentDriverRoute()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-300" title="Zerar Rota">
-                Zerar
+                🔄 Zerar
               </button>
             </div>
 
@@ -247,10 +247,10 @@
               </span>
               <div class="flex items-center justify-end gap-1.5 mt-1">
                 <button onclick="manualRefreshGpsSales()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1" title="Atualizar vendas e pings de entrega">
-                  Atualizar
+                  🔄 Refresh
                 </button>
                 <button onclick="centerMapOnDriver()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1">
-                  Centralizar
+                  🎯 Centralizar
                 </button>
               </div>
             </div>
@@ -271,14 +271,14 @@
     </section>
 
     <!-- ABA FORMULÁRIO DE NOVA / EDITAR VENDA COM LEITOR AUTOMÁTICO E AUTOCOMPLETE -->
-    <section id="section-new" class="hidden bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+    <section id="section-new" class="hidden bg-white rounded-2xl p-2.5 sm:p-5 shadow-sm border border-slate-200 space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
         <h2 id="form-title" class="text-base font-bold text-slate-800">➕ Anotar Nova Venda</h2>
         <button id="cancel-edit-btn" onclick="resetForm()" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">Cancelar Edição</button>
       </div>
 
       <!-- Leitor Automático por Mensagem RegEx -->
-      <div id="magic-parse-box" class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl space-y-2">
+      <div id="magic-parse-box" class="bg-emerald-50 border border-emerald-200 p-2.5 sm:p-3.5 rounded-xl space-y-2">
         <div class="flex items-center justify-between">
           <label class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
             <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -289,7 +289,7 @@
         <p class="text-[11px] text-emerald-700">
           Cole o texto do WhatsApp enviado pelo cliente e clique abaixo para tentar extrair os dados automaticamente:
         </p>
-        <textarea id="pasted-message" rows="3" placeholder="Cole aqui o pedido do cliente..." class="w-full p-2.5 bg-white border border-emerald-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        <textarea id="pasted-message" rows="3" placeholder="Cole aqui o pedido do cliente..." class="w-full p-2 bg-white border border-emerald-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
         <button type="button" onclick="parsePastedMessage()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Extrair Dados da Mensagem
@@ -297,14 +297,14 @@
       </div>
 
       <!-- Aviso de alerta de leitura -->
-      <div id="parsed-alert" class="hidden bg-amber-50 border border-amber-300 p-3 rounded-xl text-xs text-amber-900 font-medium flex items-center gap-2">
+      <div id="parsed-alert" class="hidden bg-amber-50 border border-amber-300 p-2.5 rounded-xl text-xs text-amber-900 font-medium flex items-center gap-2">
         <span class="text-base animate-bounce">⚠️</span>
         <span>Dados extraídos! Verifique e preencha os <strong>campos em vermelho pisca</strong> que faltam.</span>
       </div>
 
-      <form id="sale-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+      <form id="sale-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <!-- Seção Cliente & Entrega -->
-        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-3">
+        <div class="bg-slate-50 p-2.5 sm:p-3.5 rounded-xl border border-slate-100 space-y-3">
           <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Cliente & Entrega</p>
 
           <div>
@@ -312,32 +312,32 @@
               <span>Nome do Cliente *</span>
               <span id="alert-customerName" class="hidden text-[10px] text-red-600 font-bold animate-pulse">Preenchimento Necessário!</span>
             </label>
-            <input type="text" id="input-customerName" required oninput="calculateFormTotal()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+            <input type="text" id="input-customerName" required oninput="calculateFormTotal()" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
           </div>
 
           <!-- Campos Separados de Estado (Pará), Cidade e Número -->
-          <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+          <div class="grid grid-cols-3 gap-1.5 sm:gap-3 pt-1">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Estado</label>
-              <input type="text" id="input-state" value="Pará (PA)" disabled class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 font-bold cursor-not-allowed">
+              <input type="text" id="input-state" value="Pará (PA)" disabled class="w-full px-1.5 sm:px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-500 font-bold cursor-not-allowed text-center sm:text-left truncate">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Cidade</label>
-              <input type="text" id="input-city" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: Ananindeua, Belém..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input type="text" id="input-city" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: Ananindeua" class="w-full px-2 py-2 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Número</label>
-              <input type="text" id="input-number" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: 123, Mz 4" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input type="text" id="input-number" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: 123" class="w-full px-2 py-2 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
                 <span>Telefone / WhatsApp</span>
                 <span id="alert-phone" class="hidden text-[10px] text-red-600 font-bold animate-pulse">Não encontrado</span>
               </label>
-              <input type="tel" id="input-phone" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+              <input type="tel" id="input-phone" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
             </div>
 
             <!-- Campo Endereço com Autocomplete de GPS -->
@@ -347,7 +347,7 @@
                 <span id="alert-address" class="hidden text-[10px] text-red-600 font-bold animate-pulse">Não encontrado</span>
               </label>
               <div class="relative">
-                <input type="text" id="input-address" oninput="handleAddressInput(this.value)" autocomplete="off" placeholder="Digite a rua, bairro..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+                <input type="text" id="input-address" oninput="handleAddressInput(this.value)" autocomplete="off" placeholder="Digite a rua, bairro..." class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
                 <span id="address-loading-spinner" class="hidden absolute right-3 top-2.5 text-slate-400 animate-spin">⏳</span>
               </div>
 
@@ -546,7 +546,7 @@
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
       <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-sm flex items-center gap-1.5">
-           Cadastrar Novo Motorista
+          🛵 Cadastrar Novo Motorista
         </span>
         <button type="button" onclick="closeDriverModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -1010,7 +1010,7 @@
           drivers.map(d => {
             const norm = normalizeDriver(d);
             const icon = getDriverVehicleIcon(norm.vehicle);
-            return `<option value="${norm.name}">${icon} ${norm.name} (${norm.vehicle === 'carro' ? 'Carro' : 'Moto'})</option>`;
+            return `<option value="${norm.name}">${norm.name} (${norm.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</option>`;
           }).join('');
         if (currentVal && drivers.some(d => normalizeDriver(d).name === currentVal)) {
           select.value = currentVal;
@@ -1026,7 +1026,7 @@
           gpsSelect.innerHTML = drivers.map(d => {
             const norm = normalizeDriver(d);
             const icon = getDriverVehicleIcon(norm.vehicle);
-            return `<option value="${norm.name}">${icon} ${norm.name}</option>`;
+            return `<option value="${norm.name}">${norm.name} (${norm.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</option>`;
           }).join('');
           if (prevGpsVal && drivers.some(d => normalizeDriver(d).name === prevGpsVal)) {
             gpsSelect.value = prevGpsVal;
