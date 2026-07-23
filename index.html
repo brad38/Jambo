@@ -147,7 +147,7 @@
       
       <!-- Busca por Texto -->
       <div class="relative">
-        <input type="text" id="search-input" oninput="renderSales()" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm">
+        <input type="text" id="search-input" oninput="renderSales()" placeholder="Buscar por cliente, telefone, item..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm">
         <div class="absolute left-3 top-3 text-slate-400">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
@@ -183,14 +183,27 @@
     <!-- ABA MOTORISTAS & GPS -->
     <section id="section-drivers" class="hidden space-y-4">
       
-      <!-- CARD DE RASTREAMENTO GPS DO MOTORISTA -->
+      <!-- PAINEL DE VENDAS AGRUPADAS POR MOTORISTA -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-slate-800">🛵 / 🚗 Vendas por Motorista</h2>
+          <p class="text-xs text-slate-500">Acompanhe as entregas delegadas a cada profissional e seu veículo.</p>
+        </div>
+        <button onclick="openDriverModal()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition shadow-sm">
+          + Novo Motorista
+        </button>
+      </div>
+
+      <div id="drivers-container" class="space-y-4"></div>
+
+      <!-- CARD DE RASTREAMENTO GPS DO MOTORISTA E MAPA -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div>
             <h2 class="text-base font-bold text-slate-800 flex items-center gap-1.5">
-              <span>📍</span> Rastreamento de Rota GPS em Tempo Real
+              <span>📍</span> Mapa de Entregas & Rota GPS em Tempo Real
             </h2>
-            <p class="text-xs text-slate-500">Ative o GPS para registrar os KMs e pingar o percurso do motorista no mapa.</p>
+            <p class="text-xs text-slate-500">Veja os pings dos pedidos no mapa e rastreie o percurso do motorista.</p>
           </div>
           
           <span id="gps-status-badge" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
@@ -210,10 +223,14 @@
               <button id="btn-toggle-gps" onclick="toggleGpsTracking()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-sm">
                 <span>🟢</span> Iniciar GPS
               </button>
-              <button onclick="resetCurrentDriverRoute()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-300" title="Zerar Rota">
+              <button id="btn-reset-gps" onclick="resetCurrentDriverRoute()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-300" title="Zerar Rota">
                 🔄 Zerar
               </button>
             </div>
+
+            <p id="gps-not-driver-notice" class="hidden text-[10px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 font-semibold leading-tight">
+              👀 Modo Visualização
+            </p>
           </div>
 
           <!-- Métricas de KM e Localização -->
@@ -228,9 +245,14 @@
               <span class="text-[10px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-md font-mono font-bold block mb-1">
                 <span id="gps-pings-count">0</span> pings registrados
               </span>
-              <button onclick="centerMapOnDriver()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1">
-                🎯 Centralizar
-              </button>
+              <div class="flex items-center justify-end gap-1.5 mt-1">
+                <button onclick="manualRefreshGpsSales()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1" title="Atualizar vendas e pings de entrega">
+                  🔄 Refresh
+                </button>
+                <button onclick="centerMapOnDriver()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1">
+                  🎯 Centralizar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -246,22 +268,9 @@
           </div>
         </div>
       </div>
-
-      <!-- PAINEL DE VENDAS AGRUPADAS POR MOTORISTA -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-        <div>
-          <h2 class="text-base font-bold text-slate-800">🛵 Vendas por Motorista</h2>
-          <p class="text-xs text-slate-500">Acompanhe as entregas delegadas a cada profissional.</p>
-        </div>
-        <button onclick="promptAddDriver()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition shadow-sm">
-          + Novo Motorista
-        </button>
-      </div>
-
-      <div id="drivers-container" class="space-y-4"></div>
     </section>
 
-    <!-- ABA FORMULÁRIO DE NOVA / EDITAR VENDA COM LEITOR AUTOMÁTICO -->
+    <!-- ABA FORMULÁRIO DE NOVA / EDITAR VENDA COM LEITOR AUTOMÁTICO E AUTOCOMPLETE -->
     <section id="section-new" class="hidden bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
         <h2 id="form-title" class="text-base font-bold text-slate-800">➕ Anotar Nova Venda</h2>
@@ -280,7 +289,7 @@
         <p class="text-[11px] text-emerald-700">
           Cole o texto do WhatsApp enviado pelo cliente e clique abaixo para tentar extrair os dados automaticamente:
         </p>
-        <textarea id="pasted-message" rows="3" class="w-full p-2.5 bg-white border border-emerald-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+        <textarea id="pasted-message" rows="3" placeholder="Cole aqui o pedido do cliente..." class="w-full p-2.5 bg-white border border-emerald-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
         <button type="button" onclick="parsePastedMessage()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Extrair Dados da Mensagem
@@ -306,6 +315,22 @@
             <input type="text" id="input-customerName" required oninput="calculateFormTotal()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
           </div>
 
+          <!-- Campos Separados de Estado (Pará), Cidade e Número -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Estado</label>
+              <input type="text" id="input-state" value="Pará (PA)" disabled class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 font-bold cursor-not-allowed">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Cidade</label>
+              <input type="text" id="input-city" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: Ananindeua, Belém..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Número</label>
+              <input type="text" id="input-number" oninput="handleAddressInput(document.getElementById('input-address').value)" placeholder="Ex: 123, Mz 4" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
@@ -315,12 +340,19 @@
               <input type="tel" id="input-phone" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
             </div>
 
-            <div>
+            <!-- Campo Endereço com Autocomplete de GPS -->
+            <div class="relative">
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-                <span>Endereço Completo</span>
+                <span>Endereço / Rua / Bairro</span>
                 <span id="alert-address" class="hidden text-[10px] text-red-600 font-bold animate-pulse">Não encontrado</span>
               </label>
-              <input type="text" id="input-address" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+              <div class="relative">
+                <input type="text" id="input-address" oninput="handleAddressInput(this.value)" autocomplete="off" placeholder="Digite a rua, bairro..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+                <span id="address-loading-spinner" class="hidden absolute right-3 top-2.5 text-slate-400 animate-spin">⏳</span>
+              </div>
+
+              <!-- Lista de Sugestões de Endereço Estilo Google Maps -->
+              <div id="address-suggestions-list" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-52 overflow-y-auto divide-y divide-slate-100"></div>
             </div>
           </div>
 
@@ -329,7 +361,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-xs font-bold text-slate-700">Motorista Responsável *</label>
-                <button type="button" onclick="promptAddDriver()" class="text-[10px] font-bold text-emerald-700 hover:underline">+ Cadastrar Motorista</button>
+                <button type="button" onclick="openDriverModal()" class="text-[10px] font-bold text-emerald-700 hover:underline">+ Cadastrar Motorista</button>
               </div>
               <select id="select-driverName" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 <option value="">-- Selecione o Motorista --</option>
@@ -474,6 +506,120 @@
       </div>
     </section>
   </main>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE ENDEREÇO NO MAPA -->
+  <div id="address-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
+      <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-sm flex items-center gap-1.5">
+          📍 Confirmar Endereço no Mapa
+        </span>
+        <button onclick="closeAddressConfirmModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3">
+        <p class="text-xs text-slate-600 font-medium">Confirme se o ponto indicado no mapa é a localização exata para a entrega do cliente:</p>
+        <p class="text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+          💡 Dica: Você pode segurar e arrastar o pino 📍 no mapa para ajustar a posição exata!
+        </p>
+        <p id="confirm-address-text" class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-snug break-words"></p>
+
+        <!-- Container do Mapa de Confirmação -->
+        <div class="relative w-full rounded-xl overflow-hidden border border-slate-300 shadow-inner bg-slate-200">
+          <div id="address-preview-map" class="w-full h-64"></div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeAddressConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition border border-slate-300">
+            ✕ Cancelar
+          </button>
+          <button onclick="confirmSelectedAddress()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1">
+            ✓ Confirmar Endereço
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CADASTRO DE MOTORISTA (POPUP) -->
+  <div id="driver-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
+      <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-sm flex items-center gap-1.5">
+          🛵 Cadastrar Novo Motorista
+        </span>
+        <button type="button" onclick="closeDriverModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="saveDriverFromModal(event)" class="p-4 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Motorista *</label>
+          <input type="text" id="driver-modal-name" required placeholder="Ex: Carlos Silva" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipo de Veículo *</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="driver-veh-btn-moto" onclick="setModalVehicle('moto')" class="py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-emerald-600 text-white border-emerald-600 shadow-sm">
+              <span>🛵</span> Moto
+            </button>
+            <button type="button" id="driver-veh-btn-carro" onclick="setModalVehicle('carro')" class="py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+              <span>🚗</span> Carro
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" id="driver-modal-bind-device" class="mt-0.5 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+            <div class="text-xs">
+              <span class="font-bold text-slate-800 block">Vincular GPS a este Aparelho</span>
+              <span class="text-slate-500 block text-[11px] leading-tight mt-0.5">Associa o rastreamento GPS exclusivamente ao ID deste celular (<span id="driver-modal-device-id" class="font-mono font-bold text-emerald-700"></span>).</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeDriverModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition border border-slate-300">
+            Descartar (✕)
+          </button>
+          <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1">
+            ✓ Salvar Motorista
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE MOTORISTA -->
+  <div id="driver-delete-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
+      <div class="bg-rose-700 text-white px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-sm flex items-center gap-1.5">
+          🗑️ Excluir Motorista
+        </span>
+        <button type="button" onclick="closeDriverDeleteModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3">
+        <p class="text-xs text-slate-700">
+          Tem certeza que deseja excluir o motorista <strong id="delete-driver-target-name" class="text-slate-900"></strong>?
+        </p>
+        <p class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200 font-medium leading-relaxed">
+          ⚠️ As vendas associadas a ele não serão apagadas, mas ficarão sem motorista responsável.
+        </p>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeDriverDeleteModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition border border-slate-300">
+            Cancelar
+          </button>
+          <button type="button" onclick="confirmDeleteDriver()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
+            Excluir Motorista
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL DA FICHA DO PEDIDO (FICHA DE ENTREGA / COMPROVANTE) -->
   <div id="ficha-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
@@ -629,8 +775,7 @@
   </nav>
 
   <script>
-    // --- FUNÇÃO DE DECODIFICAÇÃO DE CHAVE (BULA Bypasser do GitHub Secret Scanning) ---
-    // Aceita um array de números (ASCII), string Base64 ou texto comum.
+    // --- FUNÇÃO DE DECODIFICAÇÃO DE CHAVE ---
     function decodeTokenPayload(val) {
       if (!val) return '';
       if (Array.isArray(val) && val.length > 0) {
@@ -649,13 +794,22 @@
       return '';
     }
 
+    // --- IDENTIFICAÇÃO ÚNICA DO DISPOSITIVO / APARELHO ---
+    function getDeviceId() {
+      let id = localStorage.getItem('app_device_id');
+      if (!id) {
+        id = 'DEV-' + Math.floor(1000 + Math.random() * 9000);
+        localStorage.setItem('app_device_id', id);
+      }
+      return id;
+    }
+
     // --- CONFIGURAÇÃO DO GITHUB PARA SINCRONIZAÇÃO EM NUVEM ---
     const GH_CONFIG = {
-      // Cole aqui a sua chave em formato de array numérico [103, 104, 112...] ou texto
       token: decodeTokenPayload([103,105,116,104,117,98,95,112,97,116,95,49,49,65,81,76,77,55,80,65,48,106,67,68,70,109,79,102,121,75,117,48,80,95,106,65,85,82,73,100,98,110,57,122,56,65,55,90,86,53,66,53,50,69,84,55,68,108,54,82,119,116,69,110,81,72,109,111,52,102,88,81,81,88,51,121,66,54,76,73,88,71,51,73,82,99,107,101,113,119,104,83,110]), 
-      owner: 'brad38', // Seu usuário no GitHub (ex: 'joaosilva')
-      repo: 'Jambo',  // Nome do repositório (ex: 'caderno-vendas')
-      path: 'vendas.json' // Nome do arquivo de dados no repositório
+      owner: 'brad38',
+      repo: 'Jambo',
+      path: 'vendas.json'
     };
 
     // --- ESTADO DA APLICAÇÃO ---
@@ -670,6 +824,14 @@
     let selectedFormDistance = 'perto';
     let hasParsed = false;
     let isSyncingWithGitHub = false;
+    let selectedModalVehicle = 'moto';
+    let driverToDelete = null;
+
+    // --- ESTADO DA CALCULADORA ---
+    let calcValue = '0';
+    let calcMemoryVal = null;
+    let calcCurrentOp = null;
+    let calcNewInput = true;
 
     // --- ESTADO DO RASTREAMENTO GPS & MAPA LEAFLET ---
     let leafletMap = null;
@@ -678,15 +840,17 @@
     let watchPositionId = null;
     let isTrackingGps = false;
     let currentGpsDriver = '';
-
-    // Mapeamento de Rotas por Motorista { 'Nome': { points: [{lat, lng, time}], totalKm: 0 } }
     let driverGpsRoutes = {};
 
-    // Calculadora
-    let calcValue = '0';
-    let calcMemoryVal = null;
-    let calcCurrentOp = null;
-    let calcNewInput = true;
+    // Marcadores dos pedidos no mapa, cache de geocodificação
+    let deliveryMapMarkers = [];
+    let geocodeCache = {};
+
+    // --- ESTADO DO AUTOCOMPLETE E MAPA DE CONFIRMAÇÃO DE ENDEREÇO ---
+    let addressDebounceTimer = null;
+    let addressPreviewMap = null;
+    let addressPreviewMarker = null;
+    let pendingAddressCandidate = null;
 
     // Configuração Visual de Distâncias
     const DISTANCE_CONFIG = {
@@ -695,9 +859,35 @@
       longe: { label: 'Longe', badge: 'bg-rose-600 text-white' }
     };
 
+    function loadGeocodeCache() {
+      const saved = localStorage.getItem('app_geocode_cache');
+      if (saved) {
+        try { geocodeCache = JSON.parse(saved); } catch (e) { geocodeCache = {}; }
+      }
+    }
+
+    function saveGeocodeCache() {
+      localStorage.setItem('app_geocode_cache', JSON.stringify(geocodeCache));
+    }
+
+    function normalizeDriver(d) {
+      if (!d) return { name: 'Desconhecido', vehicle: 'moto', deviceId: null };
+      if (typeof d === 'string') return { name: d, vehicle: 'moto', deviceId: null };
+      return { 
+        name: d.name || 'Desconhecido', 
+        vehicle: d.vehicle || 'moto',
+        deviceId: d.deviceId || null
+      };
+    }
+
+    function getDriverVehicleIcon(vehicle) {
+      return vehicle === 'carro' ? '🚗' : '🛵';
+    }
+
     // --- INICIALIZAÇÃO ---
     window.onload = function() {
       loadDeletedIdsFromStorage();
+      loadGeocodeCache();
       loadDriversFromStorage();
       loadGpsRoutesFromStorage();
       loadSalesFromStorage();
@@ -711,11 +901,17 @@
         updateStats();
       }
 
-      // Event listener para fechar o popover do relógio ao clicar fora
+      // Fechar menus ao clicar fora
       document.addEventListener('click', function(e) {
         const pop = document.getElementById('time-popover');
         if (pop && !pop.contains(e.target) && !e.target.closest('button[onclick="toggleTimePopover()"]')) {
           pop.classList.add('hidden');
+        }
+
+        const sugList = document.getElementById('address-suggestions-list');
+        const addrInput = document.getElementById('input-address');
+        if (sugList && !sugList.contains(e.target) && e.target !== addrInput) {
+          sugList.classList.add('hidden');
         }
       });
     };
@@ -766,8 +962,9 @@
       }
       
       drivers.forEach(d => {
-        if (!driverGpsRoutes[d]) {
-          driverGpsRoutes[d] = { points: [], totalKm: 0 };
+        const normName = normalizeDriver(d).name;
+        if (!driverGpsRoutes[normName]) {
+          driverGpsRoutes[normName] = { points: [], totalKm: 0 };
         }
       });
     }
@@ -776,22 +973,25 @@
       localStorage.setItem('app_gps_routes_data', JSON.stringify(driverGpsRoutes));
     }
 
-    // Sincroniza e vincula a lista de motoristas com todas as vendas registradas
     function syncDriversWithSales() {
       if (!Array.isArray(drivers)) drivers = [];
+
+      drivers = drivers.map(normalizeDriver);
 
       sales.forEach(s => {
         if (s.driverName && s.driverName.trim()) {
           const dName = s.driverName.trim();
-          if (!drivers.includes(dName)) {
-            drivers.push(dName);
+          const exists = drivers.some(d => normalizeDriver(d).name.toLowerCase() === dName.toLowerCase());
+          if (!exists) {
+            drivers.push({ name: dName, vehicle: 'moto', deviceId: null });
           }
         }
       });
 
       drivers.forEach(d => {
-        if (!driverGpsRoutes[d]) {
-          driverGpsRoutes[d] = { points: [], totalKm: 0 };
+        const normName = normalizeDriver(d).name;
+        if (!driverGpsRoutes[normName]) {
+          driverGpsRoutes[normName] = { points: [], totalKm: 0 };
         }
       });
 
@@ -807,8 +1007,12 @@
       if (select) {
         const currentVal = select.value;
         select.innerHTML = '<option value="">-- Selecione o Motorista --</option>' +
-          drivers.map(d => `<option value="${d}">${d}</option>`).join('');
-        if (currentVal && drivers.includes(currentVal)) {
+          drivers.map(d => {
+            const norm = normalizeDriver(d);
+            const icon = getDriverVehicleIcon(norm.vehicle);
+            return `<option value="${norm.name}">${icon} ${norm.name} (${norm.vehicle === 'carro' ? 'Carro' : 'Moto'})</option>`;
+          }).join('');
+        if (currentVal && drivers.some(d => normalizeDriver(d).name === currentVal)) {
           select.value = currentVal;
         }
       }
@@ -819,39 +1023,152 @@
           gpsSelect.innerHTML = '<option value="">-- Nenhum motorista cadastrado --</option>';
           currentGpsDriver = '';
         } else {
-          gpsSelect.innerHTML = drivers.map(d => `<option value="${d}">${d}</option>`).join('');
-          if (prevGpsVal && drivers.includes(prevGpsVal)) {
+          gpsSelect.innerHTML = drivers.map(d => {
+            const norm = normalizeDriver(d);
+            const icon = getDriverVehicleIcon(norm.vehicle);
+            return `<option value="${norm.name}">${icon} ${norm.name}</option>`;
+          }).join('');
+          if (prevGpsVal && drivers.some(d => normalizeDriver(d).name === prevGpsVal)) {
             gpsSelect.value = prevGpsVal;
             currentGpsDriver = prevGpsVal;
           } else {
-            currentGpsDriver = drivers[0];
+            currentGpsDriver = normalizeDriver(drivers[0]).name;
             gpsSelect.value = currentGpsDriver;
           }
         }
       }
     }
 
-    function promptAddDriver() {
-      const name = prompt('Digite o nome do novo motorista:');
-      if (name && name.trim()) {
-        const cleaned = name.trim();
-        if (!drivers.includes(cleaned)) {
-          drivers.push(cleaned);
-          syncDriversWithSales();
-          document.getElementById('select-driverName').value = cleaned;
-          renderDriversView();
-          notify(`Motorista "${cleaned}" cadastrado com sucesso!`);
-        } else {
-          document.getElementById('select-driverName').value = cleaned;
-          notify('Este motorista já está cadastrado.');
-        }
+    function openDriverModal() {
+      selectedModalVehicle = 'moto';
+      setModalVehicle('moto');
+      const nameInput = document.getElementById('driver-modal-name');
+      if (nameInput) nameInput.value = '';
+
+      const chk = document.getElementById('driver-modal-bind-device');
+      if (chk) chk.checked = false;
+
+      const devSpan = document.getElementById('driver-modal-device-id');
+      if (devSpan) devSpan.textContent = getDeviceId();
+
+      const modal = document.getElementById('driver-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDriverModal() {
+      const modal = document.getElementById('driver-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function setModalVehicle(v) {
+      selectedModalVehicle = v;
+      const motoBtn = document.getElementById('driver-veh-btn-moto');
+      const carroBtn = document.getElementById('driver-veh-btn-carro');
+      if (v === 'moto') {
+        if (motoBtn) motoBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-emerald-600 text-white border-emerald-600 shadow-sm";
+        if (carroBtn) carroBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-white text-slate-700 border-slate-200 hover:bg-slate-100";
+      } else {
+        if (motoBtn) motoBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-white text-slate-700 border-slate-200 hover:bg-slate-100";
+        if (carroBtn) carroBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition bg-emerald-600 text-white border-emerald-600 shadow-sm";
       }
     }
 
-    // --- LÓGICA DE GEOLOCALIZAÇÃO GPS E CÁLCULO DE DISTÂNCIA ---
+    function saveDriverFromModal(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('driver-modal-name');
+      const name = nameInput ? nameInput.value.trim() : '';
+      if (!name) return;
+
+      const exists = drivers.some(d => normalizeDriver(d).name.toLowerCase() === name.toLowerCase());
+      if (exists) {
+        notify(`O motorista "${name}" já está cadastrado.`);
+        const sel = document.getElementById('select-driverName');
+        if (sel) sel.value = name;
+        closeDriverModal();
+        return;
+      }
+
+      const bindDevice = document.getElementById('driver-modal-bind-device').checked;
+      const devId = bindDevice ? getDeviceId() : null;
+
+      drivers.push({ name: name, vehicle: selectedModalVehicle, deviceId: devId });
+      syncDriversWithSales();
+      
+      const sel = document.getElementById('select-driverName');
+      if (sel) sel.value = name;
+
+      renderDriversView();
+      closeDriverModal();
+      notify(`Motorista ${getDriverVehicleIcon(selectedModalVehicle)} "${name}" cadastrado!`);
+      commitAndPushToGitHub(`Novo motorista cadastrado: ${name}`);
+    }
+
+    function openDriverDeleteModal(driverName) {
+      driverToDelete = driverName;
+      const targetSpan = document.getElementById('delete-driver-target-name');
+      if (targetSpan) targetSpan.textContent = driverName;
+      const modal = document.getElementById('driver-delete-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDriverDeleteModal() {
+      const modal = document.getElementById('driver-delete-modal');
+      if (modal) modal.classList.add('hidden');
+      driverToDelete = null;
+    }
+
+    function confirmDeleteDriver() {
+      if (!driverToDelete) return;
+
+      const nameToRemove = driverToDelete;
+      
+      drivers = drivers.filter(d => normalizeDriver(d).name !== nameToRemove);
+      
+      sales = sales.map(s => {
+        if (s.driverName && s.driverName.trim().toLowerCase() === nameToRemove.toLowerCase()) {
+          return { ...s, driverName: '' };
+        }
+        return s;
+      });
+
+      delete driverGpsRoutes[nameToRemove];
+
+      saveDriversToStorage();
+      saveSalesToStorage();
+      saveGpsRoutesToStorage();
+
+      syncDriversWithSales();
+      renderSales();
+      renderDriversView();
+
+      closeDriverDeleteModal();
+      notify(`Motorista "${nameToRemove}" excluído com sucesso.`);
+      commitAndPushToGitHub(`Motorista excluído: ${nameToRemove}`);
+    }
+
+    function bindCurrentDeviceToDriver(driverName) {
+      const myDevId = getDeviceId();
+      let updated = false;
+
+      drivers = drivers.map(d => {
+        const norm = normalizeDriver(d);
+        if (norm.name === driverName) {
+          updated = true;
+          return { ...norm, deviceId: myDevId };
+        }
+        return d;
+      });
+
+      if (updated) {
+        saveDriversToStorage();
+        renderDriversView();
+        notify(`📱 Este celular (${myDevId}) foi vinculado ao motorista "${driverName}"!`);
+        commitAndPushToGitHub(`Vínculo de aparelho atualizado para ${driverName}`);
+      }
+    }
 
     function calculateHaversineDistanceKm(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Raio da Terra em KM
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a =
@@ -880,6 +1197,43 @@
         return;
       }
 
+      const myDevId = getDeviceId();
+      const driverObj = drivers.find(d => normalizeDriver(d).name === currentGpsDriver);
+      const normDriver = driverObj ? normalizeDriver(driverObj) : null;
+      const routeObj = driverGpsRoutes[currentGpsDriver] || { points: [], totalKm: 0 };
+
+      const TEN_MINUTES_MS = 10 * 60 * 1000;
+      const isOtherActive = routeObj.activeDeviceId &&
+                            routeObj.activeDeviceId !== myDevId &&
+                            routeObj.lastPingMs &&
+                            (Date.now() - routeObj.lastPingMs < TEN_MINUTES_MS);
+
+      if (isOtherActive) {
+        notify(`⚠️ O motorista "${currentGpsDriver}" já está com o GPS ATIVO em outro aparelho (${routeObj.activeDeviceId})!`);
+        return;
+      }
+
+      if (normDriver && normDriver.deviceId && normDriver.deviceId !== myDevId) {
+        const transfer = confirm(`⚠️ O motorista "${currentGpsDriver}" está vinculado ao celular (${normDriver.deviceId}).\n\nSeu celular atual é (${myDevId}).\n\nDeseja TRANSFERIR o vínculo deste motorista para ESTE celular e iniciar o GPS?`);
+        if (transfer) {
+          normDriver.deviceId = myDevId;
+          saveDriversToStorage();
+          renderDriversView();
+        } else {
+          notify('Ação cancelada. Apenas o aparelho vinculado ao motorista pode iniciar o GPS.');
+          return;
+        }
+      } else if (normDriver && !normDriver.deviceId) {
+        normDriver.deviceId = myDevId;
+        saveDriversToStorage();
+        renderDriversView();
+      }
+
+      routeObj.activeDeviceId = myDevId;
+      routeObj.lastPingMs = Date.now();
+      saveGpsRoutesToStorage();
+      commitAndPushToGitHub(`GPS iniciado para ${currentGpsDriver}`);
+
       document.getElementById('gps-permission-overlay').classList.remove('hidden');
 
       const options = {
@@ -898,6 +1252,13 @@
       }
 
       isTrackingGps = false;
+
+      if (currentGpsDriver && driverGpsRoutes[currentGpsDriver]) {
+        driverGpsRoutes[currentGpsDriver].activeDeviceId = null;
+        saveGpsRoutesToStorage();
+        commitAndPushToGitHub(`GPS pausado para ${currentGpsDriver}`);
+      }
+
       const badge = document.getElementById('gps-status-badge');
       badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-400"></span> GPS Desconectado';
       badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1';
@@ -930,6 +1291,9 @@
       }
 
       const routeObj = driverGpsRoutes[currentGpsDriver];
+      routeObj.activeDeviceId = getDeviceId();
+      routeObj.lastPingMs = Date.now();
+
       const points = routeObj.points;
 
       if (points.length > 0) {
@@ -1000,10 +1364,12 @@
 
       if (latLngs.length > 0) {
         const lastCoord = latLngs[latLngs.length - 1];
+        const dNorm = drivers.map(normalizeDriver).find(d => d.name === currentGpsDriver) || { vehicle: 'moto' };
+        const vIcon = getDriverVehicleIcon(dNorm.vehicle);
 
         if (!mapMarker) {
           const motorIcon = L.divIcon({
-            html: '<div style="font-size:24px; text-shadow:0 2px 4px rgba(0,0,0,0.3)">🛵</div>',
+            html: `<div style="font-size:24px; text-shadow:0 2px 4px rgba(0,0,0,0.3)">${vIcon}</div>`,
             className: 'custom-motor-marker',
             iconSize: [30, 30],
             iconAnchor: [15, 15]
@@ -1013,9 +1379,97 @@
           mapMarker.setLatLng(lastCoord);
         }
 
-        mapMarker.bindPopup(`<b>Motorista: ${currentGpsDriver}</b><br>Km Rodados: ${routeObj.totalKm.toFixed(2)} km`).openPopup();
+        mapMarker.bindPopup(`<b>Motorista: ${vIcon} ${currentGpsDriver}</b><br>Km Rodados: ${routeObj.totalKm.toFixed(2)} km`).openPopup();
         leafletMap.panTo(lastCoord);
       }
+
+      renderDeliveryPinsOnMap();
+    }
+
+    function renderDeliveryPinsOnMap() {
+      if (!leafletMap) return;
+
+      deliveryMapMarkers.forEach(m => leafletMap.removeLayer(m));
+      deliveryMapMarkers = [];
+
+      if (!currentGpsDriver) return;
+
+      const pendingSales = sales.filter(s => 
+        s.driverName && 
+        s.driverName.trim().toLowerCase() === currentGpsDriver.trim().toLowerCase() && 
+        s.status === 'pendente'
+      );
+
+      const routeObj = driverGpsRoutes[currentGpsDriver];
+      const baseLat = (routeObj && routeObj.points.length > 0) ? routeObj.points[routeObj.points.length - 1].lat : -1.365;
+      const baseLng = (routeObj && routeObj.points.length > 0) ? routeObj.points[routeObj.points.length - 1].lng : -48.372;
+
+      pendingSales.forEach((sale, index) => {
+        let lat = baseLat;
+        let lng = baseLng;
+
+        if (sale.address && geocodeCache[sale.address]) {
+          lat = geocodeCache[sale.address].lat;
+          lng = geocodeCache[sale.address].lng;
+        } else {
+          const offset = (index + 1) * 0.003 * (index % 2 === 0 ? 1 : -1);
+          lat = baseLat + offset;
+          lng = baseLng + (offset * 0.8);
+
+          if (sale.address && sale.address.length > 5) {
+            fetchGeocodeForAddress(sale.address);
+          }
+        }
+
+        const pinIcon = L.divIcon({
+          html: `<div style="background-color:#10b981; color:white; font-weight:bold; font-size:10px; padding:3px 6px; border-radius:12px; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3); white-space:nowrap; display:flex; align-items:center; gap:3px;">📦 R$ ${sale.total.toFixed(2)}</div>`,
+          className: 'custom-delivery-pin',
+          iconSize: [80, 24],
+          iconAnchor: [40, 12]
+        });
+
+        const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(leafletMap);
+
+        const popupContent = `
+          <div style="font-family:sans-serif; font-size:12px; min-width:180px;" class="space-y-1">
+            <div style="font-weight:bold; color:#0f172a; font-size:13px;">📦 ${sale.customerName}</div>
+            <div style="color:#475569;">📍 ${sale.address || 'Sem endereço'}</div>
+            <div style="color:#047857; font-weight:bold;">💰 Total: R$ ${sale.total.toFixed(2).replace('.', ',')} (Taxa: R$ ${(sale.deliveryFee || 0).toFixed(2).replace('.', ',')})</div>
+            <div style="color:#64748b; font-size:11px;">⏰ Horário: ${sale.deliveryTime || 'Não informado'}</div>
+            <div style="display:flex; gap:4px; margin-top:8px;">
+              <button onclick="openFichaModal('${sale.id}')" style="flex:1; background:#f59e0b; color:white; border:none; padding:4px 6px; border-radius:6px; font-weight:bold; font-size:10px; cursor:pointer;">
+                📄 Ver Ficha
+              </button>
+              ${sale.phone ? `
+                <a href="https://wa.me/55${sale.phone.replace(/\D/g, '')}" target="_blank" style="flex:1; background:#10b981; color:white; text-decoration:none; text-align:center; padding:4px 6px; border-radius:6px; font-weight:bold; font-size:10px;">
+                  📱 WhatsApp
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        deliveryMapMarkers.push(marker);
+      });
+    }
+
+    async function fetchGeocodeForAddress(address) {
+      if (geocodeCache[address]) return;
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=${encodeURIComponent(address)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            geocodeCache[address] = {
+              lat: parseFloat(data[0].lat),
+              lng: parseFloat(data[0].lon)
+            };
+            saveGeocodeCache();
+            renderDeliveryPinsOnMap();
+          }
+        }
+      } catch (e) { console.warn('Falha ao geocodificar:', e); }
     }
 
     function switchGpsDriverView() {
@@ -1032,6 +1486,21 @@
         }
 
         updateGpsDisplayAndMap(lastLat, lastLng);
+
+        const myDevId = getDeviceId();
+        const driverObj = drivers.find(d => normalizeDriver(d).name === currentGpsDriver);
+        const normDriver = driverObj ? normalizeDriver(driverObj) : null;
+        const isOwner = normDriver && normDriver.deviceId === myDevId;
+
+        const notice = document.getElementById('gps-not-driver-notice');
+        if (notice) {
+          if (!isOwner && normDriver && normDriver.deviceId) {
+            notice.classList.remove('hidden');
+            notice.textContent = `👀 Modo Acompanhamento (Ativo por ${normDriver.deviceId})`;
+          } else {
+            notice.classList.add('hidden');
+          }
+        }
       }
     }
 
@@ -1045,14 +1514,15 @@
     }
 
     function resetCurrentDriverRoute() {
+      if (!currentGpsDriver) return;
       driverGpsRoutes[currentGpsDriver] = { points: [], totalKm: 0 };
       saveGpsRoutesToStorage();
 
-      if (mapPolyline) {
+      if (mapPolyline && leafletMap) {
         leafletMap.removeLayer(mapPolyline);
         mapPolyline = null;
       }
-      if (mapMarker) {
+      if (mapMarker && leafletMap) {
         leafletMap.removeLayer(mapMarker);
         mapMarker = null;
       }
@@ -1061,10 +1531,312 @@
       notify(`Rota do motorista ${currentGpsDriver} zerada.`);
     }
 
-    // --- SELETOR RÁPIDO DE HORÁRIO ---
+    async function manualRefreshGpsSales() {
+      notify('Atualizando vendas e rotas de GPS...');
+      if (GH_CONFIG.token && GH_CONFIG.owner && GH_CONFIG.repo) {
+        await syncWithGitHub();
+      } else {
+        renderSales();
+        renderDriversView();
+        if (currentGpsDriver) switchGpsDriverView();
+      }
+    }
+
+    function handleAddressInput(query) {
+      if (addressDebounceTimer) clearTimeout(addressDebounceTimer);
+      
+      const suggestionsList = document.getElementById('address-suggestions-list');
+      const spinner = document.getElementById('address-loading-spinner');
+      
+      if (!query || query.trim().length < 2) {
+        if (suggestionsList) suggestionsList.classList.add('hidden');
+        if (spinner) spinner.classList.add('hidden');
+        return;
+      }
+
+      if (spinner) spinner.classList.remove('hidden');
+
+      addressDebounceTimer = setTimeout(() => {
+        const numVal = document.getElementById('input-number')?.value.trim() || '';
+        const cityVal = document.getElementById('input-city')?.value.trim() || '';
+
+        let fullSearchQuery = query.trim();
+        if (numVal) fullSearchQuery += `, ${numVal}`;
+        if (cityVal) fullSearchQuery += `, ${cityVal}`;
+        fullSearchQuery += `, Pará, Brasil`;
+
+        fetchAddressSuggestions(fullSearchQuery);
+      }, 450);
+    }
+
+    async function fetchAddressSuggestions(query) {
+      const suggestionsList = document.getElementById('address-suggestions-list');
+      const spinner = document.getElementById('address-loading-spinner');
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=br&q=${encodeURIComponent(query)}`;
+        const res = await fetch(url);
+        if (spinner) spinner.classList.add('hidden');
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+          if (suggestionsList) suggestionsList.classList.add('hidden');
+          return;
+        }
+
+        suggestionsList.innerHTML = data.map(item => {
+          const displayName = item.display_name;
+          const safeName = displayName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+          const lat = parseFloat(item.lat);
+          const lon = parseFloat(item.lon);
+          return `
+            <button type="button" onclick="selectAddressCandidate('${safeName}', ${lat}, ${lon})" class="w-full text-left p-2.5 hover:bg-emerald-50 text-xs text-slate-800 transition flex items-start gap-2">
+              <span class="text-base shrink-0">📍</span>
+              <span class="leading-tight font-medium break-words">${displayName}</span>
+            </button>
+          `;
+        }).join('');
+
+        suggestionsList.classList.remove('hidden');
+      } catch (e) {
+        if (spinner) spinner.classList.add('hidden');
+        console.warn('Erro nas sugestões de endereço:', e);
+      }
+    }
+
+    function selectAddressCandidate(address, lat, lng) {
+      pendingAddressCandidate = { address, lat, lng };
+      
+      const suggestionsList = document.getElementById('address-suggestions-list');
+      if (suggestionsList) suggestionsList.classList.add('hidden');
+
+      openAddressConfirmModal(address, lat, lng);
+    }
+
+    function openAddressConfirmModal(address, lat, lng) {
+      document.getElementById('confirm-address-text').textContent = address;
+      const modal = document.getElementById('address-confirm-modal');
+      modal.classList.remove('hidden');
+
+      setTimeout(() => {
+        if (!addressPreviewMap) {
+          addressPreviewMap = L.map('address-preview-map').setView([lat, lng], 16);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+          }).addTo(addressPreviewMap);
+        } else {
+          addressPreviewMap.invalidateSize();
+          addressPreviewMap.setView([lat, lng], 16);
+        }
+
+        const pinIcon = L.divIcon({
+          html: '<div style="font-size:32px; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.4)); cursor:move;">📍</div>',
+          className: 'custom-confirm-pin',
+          iconSize: [36, 36],
+          iconAnchor: [18, 36]
+        });
+
+        if (addressPreviewMarker) {
+          addressPreviewMap.removeLayer(addressPreviewMarker);
+        }
+
+        addressPreviewMarker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(addressPreviewMap);
+
+        addressPreviewMarker.on('dragend', function(e) {
+          const newPos = e.target.getLatLng();
+          if (pendingAddressCandidate) {
+            pendingAddressCandidate.lat = newPos.lat;
+            pendingAddressCandidate.lng = newPos.lng;
+          }
+        });
+      }, 150);
+    }
+
+    function closeAddressConfirmModal() {
+      document.getElementById('address-confirm-modal').classList.add('hidden');
+      pendingAddressCandidate = null;
+    }
+
+    function confirmSelectedAddress() {
+      if (pendingAddressCandidate) {
+        const inputAddr = document.getElementById('input-address');
+        if (inputAddr) {
+          inputAddr.value = pendingAddressCandidate.address;
+        }
+
+        geocodeCache[pendingAddressCandidate.address] = {
+          lat: pendingAddressCandidate.lat,
+          lng: pendingAddressCandidate.lng
+        };
+        saveGeocodeCache();
+        checkMissingAlerts();
+        notify('📍 Ponto de entrega confirmado com sucesso!');
+      }
+      closeAddressConfirmModal();
+    }
+
+    function parsePastedMessage() {
+      const text = document.getElementById('pasted-message').value.trim();
+      if (!text) {
+        notify('Cole uma mensagem primeiro!');
+        return;
+      }
+
+      hasParsed = true;
+
+      const phoneRegex = /(?:\+?55\s*)?(?:\(?\s*\d{2}\s*\)?\s*)?(?:9\s*)?\d{4}[\s-]*\d{4}/g;
+      const phoneMatches = text.match(phoneRegex) || [];
+      
+      const phoneInput = document.getElementById('input-phone');
+      const existingPhone = phoneInput.value.trim();
+      let secondaryPhones = [];
+
+      if (phoneMatches.length > 0) {
+        if (!existingPhone) {
+          phoneInput.value = phoneMatches[0].replace(/\D/g, '');
+          secondaryPhones = phoneMatches.slice(1);
+        } else {
+          secondaryPhones = phoneMatches;
+        }
+      }
+
+      const timeRegex = /(?:às|as|horário|hora|entregar|entrega)?\s*(\b([01]?\d|2[0-3])[:hH](\d{2})?\b)/i;
+      const timeMatch = text.match(timeRegex);
+      if (timeMatch) {
+        let h = timeMatch[2].padStart(2, '0');
+        let m = timeMatch[3] ? timeMatch[3] : '00';
+        document.getElementById('input-deliveryTime').value = `${h}:${m}`;
+      }
+
+      const nameRegex = /(?:meu nome é|me chamo|sou o|sou a|nome\s*:?\s*)\s*([A-Za-zÁÉÍÓÚáéíóúÂÊÔâêôÃÕãõÇç]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÂÊÔâêôÃÕãõÇç]+)?)/i;
+      const nameMatch = text.match(nameRegex);
+      const nameInput = document.getElementById('input-customerName');
+      if (nameMatch && !nameInput.value.trim()) {
+        nameInput.value = nameMatch[1].trim();
+      } else if (!nameInput.value.trim()) {
+        const firstLine = text.split('\n')[0]?.trim();
+        if (firstLine && firstLine.length < 30 && !firstLine.match(/\d/)) {
+          nameInput.value = firstLine;
+        }
+      }
+
+      const addressRegex = /(?:rua|av|avenida|alameda|travessa|praça|estrada|residencial|bairro|condominio|nº|n°|n\.|ap|apt|bloco)\b.*$/im;
+      const addressMatch = text.match(addressRegex);
+      const addressInput = document.getElementById('input-address');
+      if (addressMatch && !addressInput.value.trim()) {
+        addressInput.value = addressMatch[0].trim();
+      }
+
+      const numberRegex = /(?:nº|n°|n\.|num|número)\s*[:.]?\s*(\d+[a-zA-Z]?|\d+)/i;
+      const numberMatch = text.match(numberRegex);
+      const numberInput = document.getElementById('input-number');
+      if (numberMatch && numberInput && !numberInput.value.trim()) {
+        numberInput.value = numberMatch[1].trim();
+      }
+
+      const cityInput = document.getElementById('input-city');
+      if (cityInput && !cityInput.value.trim()) {
+        const paCities = ['Ananindeua', 'Belém', 'Marituba', 'Castanhal', 'Barcarena', 'Icoaraci', 'Benevides', 'Santa Isabel'];
+        for (let c of paCities) {
+          if (new RegExp(`\\b${c}\\b`, 'i').test(text)) {
+            cityInput.value = c;
+            break;
+          }
+        }
+      }
+
+      const feeRegex = /(?:taxa|frete|entrega)\b.*?(?:r\$\s*|:\s*)?(\d+(?:[.,]\d{1,2})?)/i;
+      const feeMatch = text.match(feeRegex);
+      if (feeMatch) {
+        document.getElementById('input-deliveryFee').value = parseFloat(feeMatch[1].replace(',', '.'));
+      }
+
+      const priceRegex = /(?:r\$\s*|valor\s*:?\s*|preco\s*:?\s*)(\d+(?:[.,]\d{1,2})?)/gi;
+      const priceMatches = [...text.matchAll(priceRegex)];
+      if (priceMatches.length > 0) {
+        const val = parseFloat(priceMatches[0][1].replace(',', '.'));
+        const currentFee = parseFloat(document.getElementById('input-deliveryFee').value) || 0;
+        if (val !== currentFee) {
+          document.getElementById('input-unitPrice').value = val;
+        }
+      }
+
+      const qtyRegex = /\b(\d+)\s*(x|unid|unidade|unidades|marmitas|porções|itens|pcs|peças)?\b/i;
+      const qtyMatch = text.match(qtyRegex);
+      if (qtyMatch && parseInt(qtyMatch[1]) > 0 && parseInt(qtyMatch[1]) < 100) {
+        document.getElementById('input-quantity').value = parseInt(qtyMatch[1]);
+      }
+
+      const prodInput = document.getElementById('input-productName');
+      let currentDesc = prodInput.value.trim();
+
+      let textToAppend = text;
+      if (secondaryPhones.length > 0) {
+        const phonesFormatted = secondaryPhones.map(p => `[Tel: ${p.trim()}]`).join(' ');
+        if (!textToAppend.includes(phonesFormatted)) {
+          textToAppend += ` ${phonesFormatted}`;
+        }
+      }
+
+      if (!currentDesc) {
+        prodInput.value = textToAppend;
+      } else {
+        if (!currentDesc.includes(textToAppend)) {
+          prodInput.value = `${currentDesc} | ${textToAppend}`;
+        }
+      }
+
+      calculateFormTotal();
+      document.getElementById('parsed-alert').classList.remove('hidden');
+      notify('Dados processados e acumulados na descrição!');
+    }
+
+    function checkMissingAlerts() {
+      if (!hasParsed) return;
+
+      const fieldsToCheck = [
+        { id: 'input-customerName', alertId: 'alert-customerName' },
+        { id: 'input-phone', alertId: 'alert-phone' },
+        { id: 'input-address', alertId: 'alert-address' },
+        { id: 'input-deliveryTime', alertId: 'alert-deliveryTime' },
+        { id: 'input-productName', alertId: 'alert-productName' },
+        { id: 'input-unitPrice', alertId: 'alert-unitPrice' }
+      ];
+
+      fieldsToCheck.forEach(item => {
+        const input = document.getElementById(item.id);
+        const alertSpan = document.getElementById(item.alertId);
+        if (!input) return;
+        const val = input.value.trim();
+
+        if (!val || val === '0') {
+          input.classList.add('field-missing-alert');
+          if (alertSpan) alertSpan.classList.remove('hidden');
+        } else {
+          input.classList.remove('field-missing-alert');
+          if (alertSpan) alertSpan.classList.add('hidden');
+        }
+      });
+    }
+
+    function calculateFormTotal() {
+      const qty = parseFloat(document.getElementById('input-quantity')?.value) || 0;
+      const unit = parseFloat(document.getElementById('input-unitPrice')?.value) || 0;
+      const fee = parseFloat(document.getElementById('input-deliveryFee')?.value) || 0;
+      const total = (qty * unit) + fee;
+      const totalEl = document.getElementById('form-calculated-total');
+      if (totalEl) {
+        totalEl.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+      }
+      checkMissingAlerts();
+    }
+
     function toggleTimePopover() {
       const pop = document.getElementById('time-popover');
-      pop.classList.toggle('hidden');
+      if (pop) pop.classList.toggle('hidden');
     }
 
     function setQuickTime(minutesToAdd) {
@@ -1074,158 +1846,197 @@
       const h = String(now.getHours()).padStart(2, '0');
       const m = String(now.getMinutes()).padStart(2, '0');
 
-      document.getElementById('input-deliveryTime').value = `${h}:${m}`;
-      document.getElementById('time-popover').classList.add('hidden');
+      const input = document.getElementById('input-deliveryTime');
+      if (input) input.value = `${h}:${m}`;
+      const pop = document.getElementById('time-popover');
+      if (pop) pop.classList.add('hidden');
       checkMissingAlerts();
       notify(`Horário ajustado para ${h}:${m}`);
     }
 
-    // --- SINCRONIZAÇÃO EM NUVEM (GIT AUTOMÁTICO) ---
-    async function commitAndPushToGitHub(commitMsg) {
-      if (!GH_CONFIG.token || !GH_CONFIG.owner || !GH_CONFIG.repo) {
+    function resetForm() {
+      document.getElementById('sale-form').reset();
+      document.getElementById('pasted-message').value = '';
+      document.getElementById('parsed-alert').classList.add('hidden');
+      document.getElementById('form-title').textContent = '➕ Anotar Nova Venda';
+      document.getElementById('submit-btn-text').textContent = 'Confirmar e Salvar Venda';
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('magic-parse-box').classList.remove('hidden');
+      
+      const numInput = document.getElementById('input-number');
+      if (numInput) numInput.value = '';
+
+      const cityInput = document.getElementById('input-city');
+      if (cityInput) cityInput.value = '';
+
+      const sugList = document.getElementById('address-suggestions-list');
+      if (sugList) sugList.classList.add('hidden');
+
+      editingId = null;
+      hasParsed = false;
+      setFormDistance('perto');
+      populateDriverDropdowns();
+
+      const alertSpans = document.querySelectorAll('[id^="alert-"]');
+      alertSpans.forEach(s => s.classList.add('hidden'));
+
+      const inputs = document.querySelectorAll('#sale-form input');
+      inputs.forEach(i => i.classList.remove('field-missing-alert'));
+
+      calculateFormTotal();
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const customerName = document.getElementById('input-customerName').value.trim();
+      if (!customerName) {
+        notify('Preencha o nome do cliente!');
         return;
       }
 
-      if (isSyncingWithGitHub) return;
-      isSyncingWithGitHub = true;
-      document.getElementById('sync-overlay').classList.remove('hidden');
-
-      try {
-        const url = `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
-        
-        const getRes = await fetch(url, {
-          headers: {
-            'Authorization': `token ${GH_CONFIG.token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-
-        let sha = null;
-        let remoteSales = [];
-
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-          const decodedContent = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
-          try {
-            remoteSales = JSON.parse(decodedContent);
-          } catch(e) { remoteSales = []; }
-        }
-
-        const mergedMap = new Map();
-        
-        // Adiciona vendas locais ignorando as apagadas
-        sales.forEach(s => {
-          if (!deletedIds.includes(s.id)) {
-            mergedMap.set(s.id, s);
-          }
-        });
-
-        // Adiciona vendas remotas apenas se não estiverem na lista de excluídos
-        remoteSales.forEach(s => {
-          if (!deletedIds.includes(s.id) && !mergedMap.has(s.id)) {
-            mergedMap.set(s.id, s);
-          }
-        });
-
-        sales = Array.from(mergedMap.values()).sort((a, b) => b.id - a.id);
-        saveSalesToStorage();
-        syncDriversWithSales();
-
-        const contentJson = JSON.stringify(sales, null, 2);
-        const encodedContent = btoa(unescape(encodeURIComponent(contentJson)));
-
-        const putBody = {
-          message: commitMsg || "Atualização de vendas automática",
-          content: encodedContent
-        };
-        if (sha) putBody.sha = sha;
-
-        const putRes = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${GH_CONFIG.token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json'
-          },
-          body: JSON.stringify(putBody)
-        });
-
-        if (putRes.ok) {
-          notify('Sincronizado com o GitHub! 🎉');
-        } else {
-          console.error('Erro ao enviar para GitHub', await putRes.text());
-        }
-
-      } catch (err) {
-        console.error('Falha no Sync Git:', err);
-      } finally {
-        isSyncingWithGitHub = false;
-        document.getElementById('sync-overlay').classList.add('hidden');
-        renderSales();
-        renderDriversView();
-        updateStats();
+      const driverSelect = document.getElementById('select-driverName');
+      const driverName = driverSelect.value.trim();
+      if (!driverName) {
+        notify('⚠️ Selecione um motorista responsável para salvar!');
+        driverSelect.classList.add('field-missing-alert');
+        driverSelect.focus();
+        return;
+      } else {
+        driverSelect.classList.remove('field-missing-alert');
       }
+
+      const qty = parseFloat(document.getElementById('input-quantity').value) || 1;
+      const unit = parseFloat(document.getElementById('input-unitPrice').value) || 0;
+      const fee = parseFloat(document.getElementById('input-deliveryFee').value) || 0;
+      const total = (qty * unit) + fee;
+
+      let addressVal = document.getElementById('input-address').value.trim();
+      const numberVal = document.getElementById('input-number')?.value.trim() || '';
+      const cityVal = document.getElementById('input-city')?.value.trim() || '';
+
+      if (numberVal && !addressVal.includes(numberVal)) {
+        addressVal += `, Nº ${numberVal}`;
+      }
+      if (cityVal && !addressVal.toLowerCase().includes(cityVal.toLowerCase())) {
+        addressVal += ` - ${cityVal}/PA`;
+      }
+
+      const saleObj = {
+        id: editingId || Date.now().toString(),
+        customerName: customerName,
+        phone: document.getElementById('input-phone').value.trim(),
+        address: addressVal,
+        number: numberVal,
+        city: cityVal,
+        state: 'PA',
+        driverName: driverName,
+        deliveryTime: document.getElementById('input-deliveryTime').value,
+        productName: document.getElementById('input-productName').value.trim(),
+        quantity: qty,
+        unitPrice: unit,
+        deliveryFee: fee,
+        total: total,
+        distance: selectedFormDistance,
+        status: editingId ? (sales.find(s => s.id === editingId)?.status || 'pendente') : 'pendente',
+        date: editingId ? (sales.find(s => s.id === editingId)?.date || new Date().toLocaleDateString('pt-BR')) : new Date().toLocaleDateString('pt-BR')
+      };
+
+      if (editingId) {
+        sales = sales.map(s => s.id === editingId ? saleObj : s);
+        notify('Venda atualizada com sucesso!');
+      } else {
+        sales.unshift(saleObj);
+        notify('Venda anotada com sucesso!');
+      }
+
+      saveSalesToStorage();
+      syncDriversWithSales();
+      resetForm();
+      switchTab('list');
+      updateStats();
+
+      await commitAndPushToGitHub(editingId ? "Venda atualizada" : "Nova venda registrada");
     }
 
-    async function syncWithGitHub() {
-      await commitAndPushToGitHub("Sincronização inicial de vendas");
+    function editSale(id) {
+      const sale = sales.find(s => s.id === id);
+      if (!sale) return;
+
+      editingId = sale.id;
+      document.getElementById('input-customerName').value = sale.customerName;
+      document.getElementById('input-phone').value = sale.phone || '';
+      document.getElementById('input-address').value = sale.address || '';
+      
+      const numInput = document.getElementById('input-number');
+      if (numInput) numInput.value = sale.number || '';
+
+      const cityInput = document.getElementById('input-city');
+      if (cityInput) cityInput.value = sale.city || '';
+
+      syncDriversWithSales();
+      document.getElementById('select-driverName').value = sale.driverName || '';
+      
+      document.getElementById('input-deliveryTime').value = sale.deliveryTime || '';
+      document.getElementById('input-productName').value = sale.productName || '';
+      document.getElementById('input-quantity').value = sale.quantity;
+      document.getElementById('input-unitPrice').value = sale.unitPrice;
+      document.getElementById('input-deliveryFee').value = sale.deliveryFee;
+
+      setFormDistance(sale.distance || 'perto');
+      calculateFormTotal();
+
+      document.getElementById('form-title').textContent = '✏️ Editar Anotação';
+      document.getElementById('submit-btn-text').textContent = 'Salvar Alterações';
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('magic-parse-box').classList.add('hidden');
+
+      switchTab('new');
     }
 
-    function notify(message) {
-      const toast = document.getElementById('toast');
-      const msgEl = document.getElementById('toast-message');
-      msgEl.textContent = message;
-      toast.classList.remove('hidden');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3000);
-    }
-
-    // --- NAVEGAÇÃO DE ABAS ---
     function switchTab(tab) {
       currentTab = tab;
-      document.getElementById('section-list').classList.add('hidden');
-      document.getElementById('section-drivers').classList.add('hidden');
-      document.getElementById('section-new').classList.add('hidden');
-      document.getElementById('section-export').classList.add('hidden');
+      document.getElementById('section-list')?.classList.add('hidden');
+      document.getElementById('section-drivers')?.classList.add('hidden');
+      document.getElementById('section-new')?.classList.add('hidden');
+      document.getElementById('section-export')?.classList.add('hidden');
 
       const tabIdle = "flex-1 py-2.5 px-2 rounded-lg text-center transition text-slate-600 hover:text-slate-900 whitespace-nowrap";
-      document.getElementById('tab-btn-list').className = tabIdle;
-      document.getElementById('tab-btn-drivers').className = tabIdle;
-      document.getElementById('tab-btn-new').className = tabIdle + " flex items-center justify-center gap-1";
-      document.getElementById('tab-btn-export').className = tabIdle;
+      if (document.getElementById('tab-btn-list')) document.getElementById('tab-btn-list').className = tabIdle;
+      if (document.getElementById('tab-btn-drivers')) document.getElementById('tab-btn-drivers').className = tabIdle;
+      if (document.getElementById('tab-btn-new')) document.getElementById('tab-btn-new').className = tabIdle + " flex items-center justify-center gap-1";
+      if (document.getElementById('tab-btn-export')) document.getElementById('tab-btn-export').className = tabIdle;
 
       const bottomNavIdle = "flex flex-col items-center gap-0.5 text-[10px] font-bold py-1.5 px-2 rounded-lg transition text-slate-400";
       const bottomNavActive = "flex flex-col items-center gap-0.5 text-[10px] font-bold py-1.5 px-2 rounded-lg transition text-emerald-700 bg-emerald-50";
-      document.getElementById('bottomnav-list').className = bottomNavIdle;
-      document.getElementById('bottomnav-drivers').className = bottomNavIdle;
-      document.getElementById('bottomnav-new').className = bottomNavIdle;
-      document.getElementById('bottomnav-export').className = bottomNavIdle;
+      if (document.getElementById('bottomnav-list')) document.getElementById('bottomnav-list').className = bottomNavIdle;
+      if (document.getElementById('bottomnav-drivers')) document.getElementById('bottomnav-drivers').className = bottomNavIdle;
+      if (document.getElementById('bottomnav-new')) document.getElementById('bottomnav-new').className = bottomNavIdle;
+      if (document.getElementById('bottomnav-export')) document.getElementById('bottomnav-export').className = bottomNavIdle;
 
       if (tab === 'list') {
-        document.getElementById('section-list').classList.remove('hidden');
-        document.getElementById('tab-btn-list').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
-        document.getElementById('bottomnav-list').className = bottomNavActive;
+        document.getElementById('section-list')?.classList.remove('hidden');
+        if (document.getElementById('tab-btn-list')) document.getElementById('tab-btn-list').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
+        if (document.getElementById('bottomnav-list')) document.getElementById('bottomnav-list').className = bottomNavActive;
         renderSales();
       } else if (tab === 'drivers') {
         syncDriversWithSales();
-        document.getElementById('section-drivers').classList.remove('hidden');
-        document.getElementById('tab-btn-drivers').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
-        document.getElementById('bottomnav-drivers').className = bottomNavActive;
+        document.getElementById('section-drivers')?.classList.remove('hidden');
+        if (document.getElementById('tab-btn-drivers')) document.getElementById('tab-btn-drivers').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
+        if (document.getElementById('bottomnav-drivers')) document.getElementById('bottomnav-drivers').className = bottomNavActive;
         renderDriversView();
         
         setTimeout(() => {
           switchGpsDriverView();
         }, 150);
       } else if (tab === 'new') {
-        document.getElementById('section-new').classList.remove('hidden');
-        document.getElementById('tab-btn-new').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold flex items-center justify-center gap-1 whitespace-nowrap";
-        document.getElementById('bottomnav-new').className = bottomNavActive;
+        document.getElementById('section-new')?.classList.remove('hidden');
+        if (document.getElementById('tab-btn-new')) document.getElementById('tab-btn-new').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold flex items-center justify-center gap-1 whitespace-nowrap";
+        if (document.getElementById('bottomnav-new')) document.getElementById('bottomnav-new').className = bottomNavActive;
       } else if (tab === 'export') {
-        document.getElementById('section-export').classList.remove('hidden');
-        document.getElementById('tab-btn-export').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
-        document.getElementById('bottomnav-export').className = bottomNavActive;
+        document.getElementById('section-export')?.classList.remove('hidden');
+        if (document.getElementById('tab-btn-export')) document.getElementById('tab-btn-export').className = "flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap";
+        if (document.getElementById('bottomnav-export')) document.getElementById('bottomnav-export').className = bottomNavActive;
       }
     }
 
@@ -1268,6 +2079,7 @@
       selectedFormDistance = dist;
       ['perto', 'meio_longe', 'longe'].forEach(d => {
         const btn = document.getElementById(`dist-btn-${d}`);
+        if (!btn) return;
         if (d === dist) {
           if (d === 'perto') btn.className = "dist-select-btn py-2.5 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition bg-emerald-600 text-white border-emerald-600 shadow-sm";
           if (d === 'meio_longe') btn.className = "dist-select-btn py-2.5 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition bg-amber-500 text-white border-amber-500 shadow-sm";
@@ -1276,225 +2088,6 @@
           btn.className = "dist-select-btn py-2.5 px-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition bg-white text-slate-700 border-slate-200 hover:bg-slate-100";
         }
       });
-    }
-
-    function calculateFormTotal() {
-      const qty = parseFloat(document.getElementById('input-quantity').value) || 0;
-      const unit = parseFloat(document.getElementById('input-unitPrice').value) || 0;
-      const fee = parseFloat(document.getElementById('input-deliveryFee').value) || 0;
-      const total = (qty * unit) + fee;
-      document.getElementById('form-calculated-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-      checkMissingAlerts();
-    }
-
-    function parsePastedMessage() {
-      const text = document.getElementById('pasted-message').value;
-      if (!text.trim()) {
-        notify('Cole uma mensagem primeiro!');
-        return;
-      }
-
-      hasParsed = true;
-      document.getElementById('input-productName').value = text.trim();
-
-      const phoneRegex = /(?:\+?55\s?)?(?:\(?\d{2}\)?\s?)?(?:9?\d{4}[-\s]?\d{4})/g;
-      const phoneMatches = text.match(phoneRegex);
-      if (phoneMatches && phoneMatches.length > 0) {
-        document.getElementById('input-phone').value = phoneMatches[0].replace(/\D/g, '');
-      } else {
-        document.getElementById('input-phone').value = '';
-      }
-
-      const timeRegex = /(?:às|as|horário|hora|entregar|entrega)?\s*(\b([01]?\d|2[0-3])[:hH](\d{2})?\b)/i;
-      const timeMatch = text.match(timeRegex);
-      if (timeMatch) {
-        let h = timeMatch[2].padStart(2, '0');
-        let m = timeMatch[3] ? timeMatch[3] : '00';
-        document.getElementById('input-deliveryTime').value = `${h}:${m}`;
-      } else {
-        document.getElementById('input-deliveryTime').value = '';
-      }
-
-      const nameRegex = /(?:meu nome é|me chamo|sou o|sou a|nome\s*:?\s*)\s*([A-Za-zÁÉÍÓÚáéíóúÂÊÔâêôÃÕãõÇç]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÂÊÔâêôÃÕãõÇç]+)?)/i;
-      const nameMatch = text.match(nameRegex);
-      if (nameMatch) {
-        document.getElementById('input-customerName').value = nameMatch[1].trim();
-      } else {
-        const firstLine = text.split('\n')[0]?.trim();
-        if (firstLine && firstLine.length < 30 && !firstLine.match(/\d/)) {
-          document.getElementById('input-customerName').value = firstLine;
-        } else {
-          document.getElementById('input-customerName').value = '';
-        }
-      }
-
-      const addressRegex = /(?:rua|av|avenida|alameda|travessa|praça|estrada|residencial|bairro|condominio|nº|n°|n\.|ap|apt|bloco)\b.*$/im;
-      const addressMatch = text.match(addressRegex);
-      if (addressMatch) {
-        document.getElementById('input-address').value = addressMatch[0].trim();
-      } else {
-        document.getElementById('input-address').value = '';
-      }
-
-      const feeRegex = /(?:taxa|frete|entrega)\b.*?(?:r\$\s*|:\s*)?(\d+(?:[.,]\d{1,2})?)/i;
-      const feeMatch = text.match(feeRegex);
-      if (feeMatch) {
-        document.getElementById('input-deliveryFee').value = parseFloat(feeMatch[1].replace(',', '.'));
-      } else {
-        document.getElementById('input-deliveryFee').value = '';
-      }
-
-      const priceRegex = /(?:r\$\s*|valor\s*:?\s*|preco\s*:?\s*)(\d+(?:[.,]\d{1,2})?)/gi;
-      const priceMatches = [...text.matchAll(priceRegex)];
-      if (priceMatches.length > 0) {
-        const val = parseFloat(priceMatches[0][1].replace(',', '.'));
-        const currentFee = parseFloat(document.getElementById('input-deliveryFee').value) || 0;
-        if (val !== currentFee) {
-          document.getElementById('input-unitPrice').value = val;
-        }
-      } else {
-        document.getElementById('input-unitPrice').value = '';
-      }
-
-      const qtyRegex = /\b(\d+)\s*(x|unid|unidade|unidades|marmitas|porções|itens|pcs|peças)?\b/i;
-      const qtyMatch = text.match(qtyRegex);
-      if (qtyMatch && parseInt(qtyMatch[1]) > 0 && parseInt(qtyMatch[1]) < 100) {
-        document.getElementById('input-quantity').value = parseInt(qtyMatch[1]);
-      } else {
-        document.getElementById('input-quantity').value = 1;
-      }
-
-      calculateFormTotal();
-      document.getElementById('parsed-alert').classList.remove('hidden');
-      notify('Mensagem completa transferida para o produto e dados extraídos!');
-    }
-
-    function checkMissingAlerts() {
-      if (!hasParsed) return;
-
-      const fieldsToCheck = [
-        { id: 'input-customerName', alertId: 'alert-customerName' },
-        { id: 'input-phone', alertId: 'alert-phone' },
-        { id: 'input-address', alertId: 'alert-address' },
-        { id: 'input-deliveryTime', alertId: 'alert-deliveryTime' },
-        { id: 'input-productName', alertId: 'alert-productName' },
-        { id: 'input-unitPrice', alertId: 'alert-unitPrice' }
-      ];
-
-      fieldsToCheck.forEach(item => {
-        const input = document.getElementById(item.id);
-        const alertSpan = document.getElementById(item.alertId);
-        const val = input.value.trim();
-
-        if (!val || val === '0') {
-          input.classList.add('field-missing-alert');
-          if (alertSpan) alertSpan.classList.remove('hidden');
-        } else {
-          input.classList.remove('field-missing-alert');
-          if (alertSpan) alertSpan.classList.add('hidden');
-        }
-      });
-    }
-
-    function resetForm() {
-      document.getElementById('sale-form').reset();
-      document.getElementById('pasted-message').value = '';
-      document.getElementById('parsed-alert').classList.add('hidden');
-      document.getElementById('form-title').textContent = '➕ Anotar Nova Venda';
-      document.getElementById('submit-btn-text').textContent = 'Confirmar e Salvar Venda';
-      document.getElementById('cancel-edit-btn').classList.add('hidden');
-      document.getElementById('magic-parse-box').classList.remove('hidden');
-      
-      editingId = null;
-      hasParsed = false;
-      setFormDistance('perto');
-      populateDriverDropdowns();
-
-      const alertSpans = document.querySelectorAll('[id^="alert-"]');
-      alertSpans.forEach(s => s.classList.add('hidden'));
-
-      const inputs = document.querySelectorAll('#sale-form input');
-      inputs.forEach(i => i.classList.remove('field-missing-alert'));
-
-      calculateFormTotal();
-    }
-
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-
-      const customerName = document.getElementById('input-customerName').value.trim();
-      if (!customerName) {
-        notify('Preencha o nome do cliente!');
-        return;
-      }
-
-      const driverName = document.getElementById('select-driverName').value;
-      const qty = parseFloat(document.getElementById('input-quantity').value) || 1;
-      const unit = parseFloat(document.getElementById('input-unitPrice').value) || 0;
-      const fee = parseFloat(document.getElementById('input-deliveryFee').value) || 0;
-      const total = (qty * unit) + fee;
-
-      const saleObj = {
-        id: editingId || Date.now().toString(),
-        customerName: customerName,
-        phone: document.getElementById('input-phone').value.trim(),
-        address: document.getElementById('input-address').value.trim(),
-        driverName: driverName,
-        deliveryTime: document.getElementById('input-deliveryTime').value,
-        productName: document.getElementById('input-productName').value.trim(),
-        quantity: qty,
-        unitPrice: unit,
-        deliveryFee: fee,
-        total: total,
-        distance: selectedFormDistance,
-        status: editingId ? (sales.find(s => s.id === editingId)?.status || 'pendente') : 'pendente',
-        date: editingId ? (sales.find(s => s.id === editingId)?.date || new Date().toLocaleDateString('pt-BR')) : new Date().toLocaleDateString('pt-BR')
-      };
-
-      if (editingId) {
-        sales = sales.map(s => s.id === editingId ? saleObj : s);
-        notify('Venda atualizada com sucesso!');
-      } else {
-        sales.unshift(saleObj);
-        notify('Venda anotada com sucesso!');
-      }
-
-      saveSalesToStorage();
-      syncDriversWithSales();
-      resetForm();
-      switchTab('list');
-      updateStats();
-
-      await commitAndPushToGitHub(editingId ? "Venda atualizada" : "Nova venda registrada");
-    }
-
-    function editSale(id) {
-      const sale = sales.find(s => s.id === id);
-      if (!sale) return;
-
-      editingId = sale.id;
-      document.getElementById('input-customerName').value = sale.customerName;
-      document.getElementById('input-phone').value = sale.phone || '';
-      document.getElementById('input-address').value = sale.address || '';
-      
-      syncDriversWithSales();
-      document.getElementById('select-driverName').value = sale.driverName || '';
-      
-      document.getElementById('input-deliveryTime').value = sale.deliveryTime || '';
-      document.getElementById('input-productName').value = sale.productName || '';
-      document.getElementById('input-quantity').value = sale.quantity;
-      document.getElementById('input-unitPrice').value = sale.unitPrice;
-      document.getElementById('input-deliveryFee').value = sale.deliveryFee;
-
-      setFormDistance(sale.distance || 'perto');
-      calculateFormTotal();
-
-      document.getElementById('form-title').textContent = '✏️ Editar Anotação';
-      document.getElementById('submit-btn-text').textContent = 'Salvar Alterações';
-      document.getElementById('cancel-edit-btn').classList.remove('hidden');
-      document.getElementById('magic-parse-box').classList.add('hidden');
-
-      switchTab('new');
     }
 
     async function toggleStatus(id, newStatus) {
@@ -1603,15 +2196,18 @@
       }
     }
 
-    // --- RENDERIZAÇÃO DA ABA MOTORISTAS ---
     function renderDriversView() {
       const container = document.getElementById('drivers-container');
       if (!container) return;
 
+      const myDevId = getDeviceId();
       const activeSales = sales.filter(s => s.status !== 'cancelado');
       
       const driverMap = new Map();
-      drivers.forEach(d => driverMap.set(d, []));
+      drivers.forEach(d => {
+        const norm = normalizeDriver(d);
+        driverMap.set(norm.name, []);
+      });
       driverMap.set('Não Atribuído', []);
 
       activeSales.forEach(s => {
@@ -1626,24 +2222,42 @@
       driverMap.forEach((sList, driverName) => {
         if (driverName === 'Não Atribuído' && sList.length === 0) return;
 
+        const normDriver = drivers.map(normalizeDriver).find(d => d.name === driverName) || { name: driverName, vehicle: 'moto', deviceId: null };
+        const vIcon = getDriverVehicleIcon(normDriver.vehicle);
+
         const prodSum = sList.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
         const feeSum = sList.reduce((acc, curr) => acc + (curr.deliveryFee || 0), 0);
         const grandTotal = prodSum + feeSum;
 
         const gpsRoute = driverGpsRoutes[driverName] || { points: [], totalKm: 0 };
+        const isBoundToMe = normDriver.deviceId === myDevId;
 
         html += `
           <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
-            <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-2.5">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-2.5 gap-2">
               <div>
-                <h3 class="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>🛵</span> ${driverName}
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                  <span>${vIcon}</span> ${driverName}
+                  <span class="text-[10px] font-normal text-slate-400">(${normDriver.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</span>
+                  ${normDriver.deviceId ? `
+                    <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${isBoundToMe ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600'}">
+                      📱 ${isBoundToMe ? 'Este Celular' : normDriver.deviceId}
+                    </span>
+                  ` : ''}
                 </h3>
-                <div class="flex items-center gap-2 mt-0.5">
+                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
                   <span class="text-[11px] text-slate-500">${sList.length} entrega(s) ativa(s)</span>
                   <span class="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
                     📍 ${gpsRoute.totalKm.toFixed(2)} KM percorridos
                   </span>
+                  ${!isBoundToMe ? `
+                    <button onclick="bindCurrentDeviceToDriver('${driverName}')" class="text-[10px] text-emerald-700 hover:underline font-bold">
+                      📱 Vincular meu Celular
+                    </button>
+                  ` : ''}
+                  <button onclick="openDriverDeleteModal('${driverName}')" class="text-[10px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-lg border border-rose-200 transition" title="Excluir Motorista">
+                    🗑️ Excluir
+                  </button>
                 </div>
               </div>
 
@@ -1653,7 +2267,6 @@
               </div>
             </div>
 
-            <!-- Divisão Financeira Detalhada -->
             <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               <div>
                 <p class="text-[10px] text-slate-400 font-bold uppercase">Produtos/Itens</p>
@@ -1665,7 +2278,6 @@
               </div>
             </div>
 
-            <!-- Lista de Entregas do Motorista -->
             ${sList.length === 0 ? `
               <p class="text-xs text-slate-400 italic text-center py-2">Nenhuma entrega delegada a este motorista no momento.</p>
             ` : `
@@ -1704,8 +2316,9 @@
     }
 
     function renderSales() {
-      const query = document.getElementById('search-input').value.toLowerCase();
+      const query = document.getElementById('search-input')?.value.toLowerCase() || '';
       const container = document.getElementById('sales-list-container');
+      if (!container) return;
       
       const filtered = sales.filter(s => {
         const matchesSearch =
@@ -1720,7 +2333,8 @@
         return matchesSearch && matchesDist && matchesStatus;
       });
 
-      document.getElementById('sales-count').textContent = sales.length;
+      const countEl = document.getElementById('sales-count');
+      if (countEl) countEl.textContent = sales.length;
 
       if (filtered.length === 0) {
         container.innerHTML = `
@@ -1842,21 +2456,26 @@
       const completedCount = sales.filter(s => s.status === 'vendido').length;
       const canceledCount = sales.filter(s => s.status === 'cancelado').length;
 
-      document.getElementById('stat-revenue').textContent = `R$ ${totalRev.toFixed(2).replace('.', ',')}`;
-      document.getElementById('stat-completed').textContent = `${completedCount} / ${sales.length}`;
-      document.getElementById('stat-canceled').textContent = canceledCount;
+      const revEl = document.getElementById('stat-revenue');
+      if (revEl) revEl.textContent = `R$ ${totalRev.toFixed(2).replace('.', ',')}`;
+      const compEl = document.getElementById('stat-completed');
+      if (compEl) compEl.textContent = `${completedCount} / ${sales.length}`;
+      const cancEl = document.getElementById('stat-canceled');
+      if (cancEl) cancEl.textContent = canceledCount;
     }
 
-    // --- CALCULADORA INTEGRADA ---
     function toggleCalculator(show) {
       const modal = document.getElementById('calc-modal');
       const actions = document.getElementById('calc-inject-actions');
+      if (!modal) return;
       if (show) {
         modal.classList.remove('hidden');
-        if (currentTab === 'new') {
-          actions.classList.remove('hidden');
-        } else {
-          actions.classList.add('hidden');
+        if (actions) {
+          if (currentTab === 'new') {
+            actions.classList.remove('hidden');
+          } else {
+            actions.classList.add('hidden');
+          }
         }
       } else {
         modal.classList.add('hidden');
@@ -1872,7 +2491,7 @@
         if (digit === '.' && calcValue.includes('.')) return;
         calcValue += digit;
       }
-      display.textContent = calcValue;
+      if (display) display.textContent = calcValue;
     }
 
     function calcOp(op) {
@@ -1882,14 +2501,14 @@
 
       if (calcMemoryVal !== null && !calcNewInput) {
         calcMemoryVal = executeCalcOp(calcMemoryVal, current, calcCurrentOp);
-        display.textContent = String(calcMemoryVal);
+        if (display) display.textContent = String(calcMemoryVal);
       } else {
         calcMemoryVal = current;
       }
 
       calcCurrentOp = op;
       calcNewInput = true;
-      memDisplay.textContent = `${calcMemoryVal} ${op}`;
+      if (memDisplay) memDisplay.textContent = `${calcMemoryVal} ${op}`;
     }
 
     function executeCalcOp(n1, n2, op) {
@@ -1909,12 +2528,12 @@
       const current = parseFloat(calcValue);
 
       calcValue = String(executeCalcOp(calcMemoryVal, current, calcCurrentOp));
-      display.textContent = calcValue;
+      if (display) display.textContent = calcValue;
 
       calcMemoryVal = null;
       calcCurrentOp = null;
       calcNewInput = true;
-      memDisplay.textContent = '';
+      if (memDisplay) memDisplay.textContent = '';
     }
 
     function calcClear() {
@@ -1922,14 +2541,22 @@
       calcMemoryVal = null;
       calcCurrentOp = null;
       calcNewInput = true;
-      document.getElementById('calc-display').textContent = '0';
-      document.getElementById('calc-memory').textContent = '';
+      const display = document.getElementById('calc-display');
+      if (display) display.textContent = '0';
+      const memDisplay = document.getElementById('calc-memory');
+      if (memDisplay) memDisplay.textContent = '';
     }
 
     function applyCalcToForm(fieldId) {
       const val = parseFloat(calcValue) || 0;
-      if (fieldId === 'unitPrice') document.getElementById('input-unitPrice').value = val;
-      if (fieldId === 'deliveryFee') document.getElementById('input-deliveryFee').value = val;
+      if (fieldId === 'unitPrice') {
+        const input = document.getElementById('input-unitPrice');
+        if (input) input.value = val;
+      }
+      if (fieldId === 'deliveryFee') {
+        const input = document.getElementById('input-deliveryFee');
+        if (input) input.value = val;
+      }
       calculateFormTotal();
       toggleCalculator(false);
       notify(`R$ ${val.toFixed(2)} aplicado ao formulário!`);
@@ -1996,6 +2623,108 @@
       link.click();
       document.body.removeChild(link);
       notify('Planilha exportada com sucesso!');
+    }
+
+    async function commitAndPushToGitHub(commitMsg) {
+      if (!GH_CONFIG.token || !GH_CONFIG.owner || !GH_CONFIG.repo) {
+        return;
+      }
+
+      if (isSyncingWithGitHub) return;
+      isSyncingWithGitHub = true;
+      const overlay = document.getElementById('sync-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+
+      try {
+        const url = `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+        
+        const getRes = await fetch(url, {
+          headers: {
+            'Authorization': `token ${GH_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        let sha = null;
+        let remoteSales = [];
+
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+          const decodedContent = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
+          try {
+            remoteSales = JSON.parse(decodedContent);
+          } catch(e) { remoteSales = []; }
+        }
+
+        const mergedMap = new Map();
+        
+        sales.forEach(s => {
+          if (!deletedIds.includes(s.id)) {
+            mergedMap.set(s.id, s);
+          }
+        });
+
+        remoteSales.forEach(s => {
+          if (!deletedIds.includes(s.id) && !mergedMap.has(s.id)) {
+            mergedMap.set(s.id, s);
+          }
+        });
+
+        sales = Array.from(mergedMap.values()).sort((a, b) => b.id - a.id);
+        saveSalesToStorage();
+        syncDriversWithSales();
+
+        const contentJson = JSON.stringify(sales, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(contentJson)));
+
+        const putBody = {
+          message: commitMsg || "Atualização de vendas automática",
+          content: encodedContent
+        };
+        if (sha) putBody.sha = sha;
+
+        const putRes = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${GH_CONFIG.token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(putBody)
+        });
+
+        if (putRes.ok) {
+          notify('Sincronizado com o GitHub! 🎉');
+        } else {
+          console.error('Erro ao enviar para GitHub', await putRes.text());
+        }
+
+      } catch (err) {
+        console.error('Falha no Sync Git:', err);
+      } finally {
+        isSyncingWithGitHub = false;
+        if (overlay) overlay.classList.add('hidden');
+        renderSales();
+        renderDriversView();
+        updateStats();
+      }
+    }
+
+    async function syncWithGitHub() {
+      await commitAndPushToGitHub("Sincronização inicial de vendas");
+    }
+
+    function notify(message) {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toast-message');
+      if (toast && msgEl) {
+        msgEl.textContent = message;
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      }
     }
   </script>
 </body>
