@@ -1,18 +1,1 @@
-[
-  {
-    "id": "1784835853841",
-    "customerName": "Brad",
-    "phone": "91980910320",
-    "address": "isisdu",
-    "driverName": "Marlon",
-    "deliveryTime": "17:03",
-    "productName": "6 jambo",
-    "quantity": 6,
-    "unitPrice": 2,
-    "deliveryFee": 15,
-    "total": 27,
-    "distance": "perto",
-    "status": "pendente",
-    "date": "23/07/2026"
-  }
-]
+[]
