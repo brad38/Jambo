@@ -1,18 +1,1 @@
-[
-  {
-    "id": "1784833883022",
-    "customerName": "Brad",
-    "phone": "91980910320",
-    "address": "Rua costa e silva",
-    "driverName": "Marlon",
-    "deliveryTime": "16:10",
-    "productName": "Quero Jambo",
-    "quantity": 9,
-    "unitPrice": 2,
-    "deliveryFee": 15,
-    "total": 33,
-    "distance": "perto",
-    "status": "pendente",
-    "date": "23/07/2026"
-  }
-]
+[]
