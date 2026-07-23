@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caderno de Vendas</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet CSS & JS para o Mapa Interativo de GPS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Tabler Icons CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css" />
   
   <style>
     /* Estilos para animação de piscar em vermelho nos campos faltantes */
@@ -125,13 +128,13 @@
       </div>
     </div>
 
-    <!-- Abas de Navegação (Exibidas apenas em Desktop / Ocultas no Celular) -->
+    <!-- Abas de Navegação Desktop -->
     <div class="hidden md:flex bg-slate-200 p-1 rounded-xl mb-5 font-medium text-xs sm:text-sm overflow-x-auto">
       <button id="tab-btn-list" onclick="switchTab('list')" class="flex-1 py-2.5 px-2 rounded-lg text-center transition bg-white text-emerald-800 shadow-sm font-bold whitespace-nowrap">
         Lista de Vendas (<span id="sales-count">0</span>)
       </button>
       <button id="tab-btn-drivers" onclick="switchTab('drivers')" class="flex-1 py-2.5 px-2 rounded-lg text-center transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
-        🛵 Motoristas & GPS
+        Motoristas & GPS
       </button>
       <button id="tab-btn-new" onclick="switchTab('new')" class="flex-1 py-2.5 rounded-lg text-center transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1 whitespace-nowrap">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -183,10 +186,10 @@
     <!-- ABA MOTORISTAS & GPS -->
     <section id="section-drivers" class="hidden space-y-4">
       
-      <!-- PAINEL DE VENDAS AGRUPADAS POR MOTORISTA -->
+      <!-- PAINEL DE VENDAS AGRUPADAS POR MOTORISTA (REORGANIZADO NO TOPO) -->
       <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
         <div>
-          <h2 class="text-base font-bold text-slate-800">🛵 / 🚗 Vendas por Motorista</h2>
+          <h2 class="text-base font-bold text-slate-800">Vendas por Motorista</h2>
           <p class="text-xs text-slate-500">Acompanhe as entregas delegadas a cada profissional e seu veículo.</p>
         </div>
         <button onclick="openDriverModal()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition shadow-sm">
@@ -201,7 +204,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div>
             <h2 class="text-base font-bold text-slate-800 flex items-center gap-1.5">
-              <span>📍</span> Mapa de Entregas & Rota GPS em Tempo Real
+              Mapa de Entregas & Rota GPS em Tempo Real
             </h2>
             <p class="text-xs text-slate-500">Veja os pings dos pedidos no mapa e rastreie o percurso do motorista.</p>
           </div>
@@ -221,15 +224,15 @@
 
             <div class="flex gap-2 pt-1">
               <button id="btn-toggle-gps" onclick="toggleGpsTracking()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-sm">
-                <span>🟢</span> Iniciar GPS
+                Iniciar GPS
               </button>
               <button id="btn-reset-gps" onclick="resetCurrentDriverRoute()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-300" title="Zerar Rota">
-                🔄 Zerar
+                Zerar
               </button>
             </div>
 
             <p id="gps-not-driver-notice" class="hidden text-[10px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 font-semibold leading-tight">
-              👀 Modo Visualização
+              Modo Visualização
             </p>
           </div>
 
@@ -247,10 +250,10 @@
               </span>
               <div class="flex items-center justify-end gap-1.5 mt-1">
                 <button onclick="manualRefreshGpsSales()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1" title="Atualizar vendas e pings de entrega">
-                  🔄 Refresh
+                  Atualizar
                 </button>
                 <button onclick="centerMapOnDriver()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition inline-flex items-center gap-1">
-                  🎯 Centralizar
+                  Centralizar
                 </button>
               </div>
             </div>
@@ -262,7 +265,6 @@
           <div id="driver-map" class="w-full h-72 sm:h-80"></div>
           
           <div id="gps-permission-overlay" class="hidden absolute inset-0 bg-slate-900/70 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-white text-center z-20">
-            <p class="text-2xl mb-1">📡</p>
             <p class="text-sm font-bold">Solicitando permissão de Localização GPS...</p>
             <p class="text-xs text-slate-300 mt-1">Por favor, permita o acesso ao GPS no seu dispositivo para rastrear a rota.</p>
           </div>
@@ -270,10 +272,10 @@
       </div>
     </section>
 
-    <!-- ABA FORMULÁRIO DE NOVA / EDITAR VENDA COM LEITOR AUTOMÁTICO E AUTOCOMPLETE -->
+    <!-- ABA FORMULÁRIO DE NOVA / EDITAR VENDA -->
     <section id="section-new" class="hidden bg-white rounded-2xl p-2.5 sm:p-5 shadow-sm border border-slate-200 space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <h2 id="form-title" class="text-base font-bold text-slate-800">➕ Anotar Nova Venda</h2>
+        <h2 id="form-title" class="text-base font-bold text-slate-800">Anotar Nova Venda</h2>
         <button id="cancel-edit-btn" onclick="resetForm()" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">Cancelar Edição</button>
       </div>
 
@@ -385,16 +387,16 @@
               <div id="time-popover" class="hidden absolute right-0 top-full mt-1 z-40 bg-white border border-slate-200 rounded-xl shadow-xl p-2 w-44 space-y-1">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-0.5">Definir Horário:</p>
                 <button type="button" onclick="setQuickTime(0)" class="w-full text-left text-xs font-semibold px-2 py-1.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition flex items-center justify-between">
-                  <span>⚡ Agora</span>
+                  <span>Agora</span>
                 </button>
                 <button type="button" onclick="setQuickTime(10)" class="w-full text-left text-xs font-semibold px-2 py-1.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition flex items-center justify-between">
-                  <span>⏱️ Daqui a 10m</span>
+                  <span>Daqui a 10m</span>
                 </button>
                 <button type="button" onclick="setQuickTime(20)" class="w-full text-left text-xs font-semibold px-2 py-1.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition flex items-center justify-between">
-                  <span>⏱️ Daqui a 20m</span>
+                  <span>Daqui a 20m</span>
                 </button>
                 <button type="button" onclick="setQuickTime(30)" class="w-full text-left text-xs font-semibold px-2 py-1.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition flex items-center justify-between">
-                  <span>⏱️ Daqui a 30m</span>
+                  <span>Daqui a 30m</span>
                 </button>
               </div>
             </div>
@@ -494,7 +496,7 @@
           <h3 class="font-bold text-sm text-slate-800">Imprimir / Gerar PDF</h3>
           <p class="text-xs text-slate-500 mt-1 mb-3">Abre a caixa de impressão do navegador para imprimir ou salvar como PDF.</p>
           <button onclick="window.print()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-3 rounded-lg text-xs transition shadow-sm">
-            🖨️ Imprimir Relatório
+            Imprimir Relatório
           </button>
         </div>
       </div>
@@ -512,7 +514,7 @@
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
       <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-sm flex items-center gap-1.5">
-          📍 Confirmar Endereço no Mapa
+          Confirmar Endereço no Mapa
         </span>
         <button onclick="closeAddressConfirmModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -546,7 +548,7 @@
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
       <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-sm flex items-center gap-1.5">
-          🛵 Cadastrar Novo Motorista
+          Cadastrar Novo Motorista
         </span>
         <button type="button" onclick="closeDriverModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -596,7 +598,7 @@
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-auto">
       <div class="bg-rose-700 text-white px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-sm flex items-center gap-1.5">
-          🗑️ Excluir Motorista
+          Excluir Motorista
         </span>
         <button type="button" onclick="closeDriverDeleteModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -627,7 +629,7 @@
       <!-- Topo Ficha -->
       <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between no-print">
         <span class="font-bold text-sm flex items-center gap-1.5">
-          📄 Ficha do Pedido
+          Ficha do Pedido
         </span>
         <button onclick="closeFichaModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -635,7 +637,7 @@
       <!-- Conteúdo Impresso da Ficha estilo Cupom/Comprovante -->
       <div id="print-ticket-area" class="p-6 bg-amber-50/30 text-slate-800 font-mono text-xs border-b border-slate-200 space-y-4">
         <div class="text-center border-b border-dashed border-slate-400 pb-3">
-          <h2 class="text-base font-black tracking-tight text-slate-900 uppercase">📋 FICHA DE ENTREGA</h2>
+          <h2 class="text-base font-black tracking-tight text-slate-900 uppercase">FICHA DE ENTREGA</h2>
           <p id="ficha-date-time" class="text-[11px] text-slate-500 mt-0.5">00/00/0000 - 00:00</p>
           <div id="ficha-status-badge" class="mt-2 inline-block px-2.5 py-0.5 text-[10px] font-black rounded-full uppercase bg-slate-200 text-slate-800">
             PENDENTE
@@ -695,10 +697,10 @@
       <!-- Ações do Modal -->
       <div class="p-3 bg-slate-100 flex gap-2 no-print">
         <button onclick="printFicha()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-          🖨️ Imprimir
+          Imprimir
         </button>
         <button onclick="shareFichaWhatsApp()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-          📱 WhatsApp
+          WhatsApp
         </button>
       </div>
     </div>
@@ -709,7 +711,7 @@
     <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
       <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-sm flex items-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> Calculadora
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> Calculadora
         </span>
         <button onclick="toggleCalculator(false)" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -1000,6 +1002,7 @@
       populateDriverDropdowns();
     }
 
+    // --- FORMATAÇÃO DO DROPDOWN DO MOTORISTA: Marlon (Moto 🛵) ---
     function populateDriverDropdowns() {
       const select = document.getElementById('select-driverName');
       const gpsSelect = document.getElementById('gps-driver-select');
@@ -1009,7 +1012,6 @@
         select.innerHTML = '<option value="">-- Selecione o Motorista --</option>' +
           drivers.map(d => {
             const norm = normalizeDriver(d);
-            const icon = getDriverVehicleIcon(norm.vehicle);
             return `<option value="${norm.name}">${norm.name} (${norm.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</option>`;
           }).join('');
         if (currentVal && drivers.some(d => normalizeDriver(d).name === currentVal)) {
@@ -1025,7 +1027,6 @@
         } else {
           gpsSelect.innerHTML = drivers.map(d => {
             const norm = normalizeDriver(d);
-            const icon = getDriverVehicleIcon(norm.vehicle);
             return `<option value="${norm.name}">${norm.name} (${norm.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</option>`;
           }).join('');
           if (prevGpsVal && drivers.some(d => normalizeDriver(d).name === prevGpsVal)) {
@@ -1099,7 +1100,7 @@
 
       renderDriversView();
       closeDriverModal();
-      notify(`Motorista ${getDriverVehicleIcon(selectedModalVehicle)} "${name}" cadastrado!`);
+      notify(`Motorista "${name}" cadastrado!`);
       commitAndPushToGitHub(`Novo motorista cadastrado: ${name}`);
     }
 
@@ -1162,7 +1163,7 @@
       if (updated) {
         saveDriversToStorage();
         renderDriversView();
-        notify(`📱 Este celular (${myDevId}) foi vinculado ao motorista "${driverName}"!`);
+        notify(`Este celular (${myDevId}) foi vinculado ao motorista "${driverName}"!`);
         commitAndPushToGitHub(`Vínculo de aparelho atualizado para ${driverName}`);
       }
     }
@@ -1209,12 +1210,12 @@
                             (Date.now() - routeObj.lastPingMs < TEN_MINUTES_MS);
 
       if (isOtherActive) {
-        notify(`⚠️ O motorista "${currentGpsDriver}" já está com o GPS ATIVO em outro aparelho (${routeObj.activeDeviceId})!`);
+        notify(`O motorista "${currentGpsDriver}" já está com o GPS ATIVO em outro aparelho (${routeObj.activeDeviceId})!`);
         return;
       }
 
       if (normDriver && normDriver.deviceId && normDriver.deviceId !== myDevId) {
-        const transfer = confirm(`⚠️ O motorista "${currentGpsDriver}" está vinculado ao celular (${normDriver.deviceId}).\n\nSeu celular atual é (${myDevId}).\n\nDeseja TRANSFERIR o vínculo deste motorista para ESTE celular e iniciar o GPS?`);
+        const transfer = confirm(`O motorista "${currentGpsDriver}" está vinculado ao celular (${normDriver.deviceId}).\n\nSeu celular atual é (${myDevId}).\n\nDeseja TRANSFERIR o vínculo deste motorista para ESTE celular e iniciar o GPS?`);
         if (transfer) {
           normDriver.deviceId = myDevId;
           saveDriversToStorage();
@@ -1264,7 +1265,7 @@
       badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1';
 
       const btn = document.getElementById('btn-toggle-gps');
-      btn.innerHTML = '<span>🟢</span> Iniciar GPS';
+      btn.innerHTML = 'Iniciar GPS';
       btn.className = 'flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-sm';
 
       notify('Rastreamento GPS pausado.');
@@ -1283,7 +1284,7 @@
       badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1';
 
       const btn = document.getElementById('btn-toggle-gps');
-      btn.innerHTML = '<span>🔴</span> Parar GPS';
+      btn.innerHTML = 'Parar GPS';
       btn.className = 'flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-sm';
 
       if (!driverGpsRoutes[currentGpsDriver]) {
@@ -1379,7 +1380,7 @@
           mapMarker.setLatLng(lastCoord);
         }
 
-        mapMarker.bindPopup(`<b>Motorista: ${vIcon} ${currentGpsDriver}</b><br>Km Rodados: ${routeObj.totalKm.toFixed(2)} km`).openPopup();
+        mapMarker.bindPopup(`<b>Motorista: ${currentGpsDriver} (${dNorm.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</b><br>Km Rodados: ${routeObj.totalKm.toFixed(2)} km`).openPopup();
         leafletMap.panTo(lastCoord);
       }
 
@@ -1496,7 +1497,7 @@
         if (notice) {
           if (!isOwner && normDriver && normDriver.deviceId) {
             notice.classList.remove('hidden');
-            notice.textContent = `👀 Modo Acompanhamento (Ativo por ${normDriver.deviceId})`;
+            notice.textContent = `Modo Visualização (Ativo por ${normDriver.deviceId})`;
           } else {
             notice.classList.add('hidden');
           }
@@ -1593,7 +1594,6 @@
           const lon = parseFloat(item.lon);
           return `
             <button type="button" onclick="selectAddressCandidate('${safeName}', ${lat}, ${lon})" class="w-full text-left p-2.5 hover:bg-emerald-50 text-xs text-slate-800 transition flex items-start gap-2">
-              <span class="text-base shrink-0">📍</span>
               <span class="leading-tight font-medium break-words">${displayName}</span>
             </button>
           `;
@@ -1673,7 +1673,7 @@
         };
         saveGeocodeCache();
         checkMissingAlerts();
-        notify('📍 Ponto de entrega confirmado com sucesso!');
+        notify('Ponto de entrega confirmado com sucesso!');
       }
       closeAddressConfirmModal();
     }
@@ -1858,7 +1858,7 @@
       document.getElementById('sale-form').reset();
       document.getElementById('pasted-message').value = '';
       document.getElementById('parsed-alert').classList.add('hidden');
-      document.getElementById('form-title').textContent = '➕ Anotar Nova Venda';
+      document.getElementById('form-title').textContent = 'Anotar Nova Venda';
       document.getElementById('submit-btn-text').textContent = 'Confirmar e Salvar Venda';
       document.getElementById('cancel-edit-btn').classList.add('hidden');
       document.getElementById('magic-parse-box').classList.remove('hidden');
@@ -1898,7 +1898,7 @@
       const driverSelect = document.getElementById('select-driverName');
       const driverName = driverSelect.value.trim();
       if (!driverName) {
-        notify('⚠️ Selecione um motorista responsável para salvar!');
+        notify('Selecione um motorista responsável para salvar!');
         driverSelect.classList.add('field-missing-alert');
         driverSelect.focus();
         return;
@@ -1986,7 +1986,7 @@
       setFormDistance(sale.distance || 'perto');
       calculateFormTotal();
 
-      document.getElementById('form-title').textContent = '✏️ Editar Anotação';
+      document.getElementById('form-title').textContent = 'Editar Anotação';
       document.getElementById('submit-btn-text').textContent = 'Salvar Alterações';
       document.getElementById('cancel-edit-btn').classList.remove('hidden');
       document.getElementById('magic-parse-box').classList.add('hidden');
@@ -2054,7 +2054,7 @@
       if (activeBtn) {
         if (dist === 'todos') activeBtn.className = "filter-dist-btn py-1.5 px-1 rounded-lg font-bold transition text-center bg-slate-800 text-white shadow-sm";
         if (dist === 'perto') activeBtn.className = "filter-dist-btn py-1.5 px-1 rounded-lg font-bold transition flex items-center justify-center gap-1 bg-emerald-600 text-white shadow-sm";
-        if (dist === 'meio_longe') activeBtn.className = "filter-dist-btn py-1.5 px-1 rounded-lg font-bold transition flex items-center justify-center gap-1 bg-amber-500 text-white shadow-sm";
+        if (dist === 'meio_longe') activeBtn.className = "filter-dist-btn py-1.5 px-1 rounded-lg font-bold transition flex items-center justify-center gap-1 bg-amber-50 text-white shadow-sm";
         if (dist === 'longe') activeBtn.className = "filter-dist-btn py-1.5 px-1 rounded-lg font-bold transition flex items-center justify-center gap-1 bg-rose-600 text-white shadow-sm";
       }
       renderSales();
@@ -2196,6 +2196,7 @@
       }
     }
 
+    // --- RENDERIZAÇÃO DA ABA MOTORISTAS (REDESIGN COMPLETO COM TABLER ICONS) ---
     function renderDriversView() {
       const container = document.getElementById('drivers-container');
       if (!container) return;
@@ -2223,7 +2224,6 @@
         if (driverName === 'Não Atribuído' && sList.length === 0) return;
 
         const normDriver = drivers.map(normalizeDriver).find(d => d.name === driverName) || { name: driverName, vehicle: 'moto', deviceId: null };
-        const vIcon = getDriverVehicleIcon(normDriver.vehicle);
 
         const prodSum = sList.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
         const feeSum = sList.reduce((acc, curr) => acc + (curr.deliveryFee || 0), 0);
@@ -2231,57 +2231,84 @@
 
         const gpsRoute = driverGpsRoutes[driverName] || { points: [], totalKm: 0 };
         const isBoundToMe = normDriver.deviceId === myDevId;
+        const isCar = normDriver.vehicle === 'carro';
+        const vIconEmoji = getDriverVehicleIcon(normDriver.vehicle);
+        const vLabel = isCar ? 'Carro' : 'Moto';
 
         html += `
-          <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
-            <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-2.5 gap-2">
-              <div>
-                <h3 class="text-base font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
-                  <span>${vIcon}</span> ${driverName}
-                  <span class="text-[10px] font-normal text-slate-400">(${normDriver.vehicle === 'carro' ? 'Carro 🚗' : 'Moto 🛵'})</span>
-                  ${normDriver.deviceId ? `
-                    <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${isBoundToMe ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600'}">
-                      📱 ${isBoundToMe ? 'Este Celular' : normDriver.deviceId}
-                    </span>
-                  ` : ''}
-                </h3>
-                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <span class="text-[11px] text-slate-500">${sList.length} entrega(s) ativa(s)</span>
-                  <span class="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                    📍 ${gpsRoute.totalKm.toFixed(2)} KM percorridos
-                  </span>
-                  ${!isBoundToMe ? `
-                    <button onclick="bindCurrentDeviceToDriver('${driverName}')" class="text-[10px] text-emerald-700 hover:underline font-bold">
-                      📱 Vincular meu Celular
-                    </button>
-                  ` : ''}
-                  <button onclick="openDriverDeleteModal('${driverName}')" class="text-[10px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-lg border border-rose-200 transition" title="Excluir Motorista">
-                    🗑️ Excluir
-                  </button>
+          <div class="bg-white rounded-xl border border-slate-300 p-4 sm:p-5 shadow-sm space-y-3.5">
+            <!-- Cabeçalho do Card -->
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-800 flex items-center justify-center shrink-0 border border-blue-100 text-xl leading-none">
+                  ${vIconEmoji}
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-slate-900 leading-tight flex items-center gap-1.5 flex-wrap">
+                    ${driverName}
+                    ${normDriver.deviceId ? `
+                      <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${isBoundToMe ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600'}">
+                        📱 ${isBoundToMe ? 'Este Celular' : normDriver.deviceId}
+                      </span>
+                    ` : ''}
+                  </h3>
+                  <p class="text-xs text-slate-500 font-medium mt-0.5">${vLabel}</p>
                 </div>
               </div>
 
               <div class="text-right">
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Total do Motorista</p>
-                <p class="text-base font-black text-emerald-700">R$ ${grandTotal.toFixed(2).replace('.', ',')}</p>
+                <p class="text-xs text-slate-400 font-medium">Total do motorista</p>
+                <p class="text-lg sm:text-xl font-bold text-emerald-800 leading-tight mt-0.5">R$ ${grandTotal.toFixed(2).replace('.', ',')}</p>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+            <!-- Tags de Entregas e KM -->
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-slate-100 text-slate-700 font-medium px-2.5 py-1 rounded-lg">
+                ${sList.length} entrega(s) ativa(s)
+              </span>
+              <span class="bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-lg border border-emerald-200/60 inline-flex items-center gap-1">
+                <i class="ti ti-map-pin text-sm"></i>
+                ${gpsRoute.totalKm.toFixed(2).replace('.', ',')} km percorridos
+              </span>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex gap-2">
+              ${!isBoundToMe ? `
+                <button onclick="bindCurrentDeviceToDriver('${driverName}')" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-medium py-2 px-3 rounded-lg border border-slate-300 text-xs transition inline-flex items-center justify-center gap-1.5 shadow-xs">
+                  <i class="ti ti-device-mobile text-sm"></i> Vincular meu celular
+                </button>
+              ` : `
+                <div class="flex-1 bg-emerald-50 text-emerald-800 font-semibold text-xs py-2 px-3 rounded-lg border border-emerald-200 text-center inline-flex items-center justify-center gap-1.5">
+                  <i class="ti ti-device-mobile text-sm"></i> Vinculado a este aparelho
+                </div>
+              `}
+              <button onclick="openDriverDeleteModal('${driverName}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold py-2 px-3 rounded-lg border border-rose-200 text-xs transition shadow-xs">
+                Excluir
+              </button>
+            </div>
+
+            <!-- Resumo Financeiro -->
+            <div class="border-t border-slate-200 pt-3 flex justify-between items-center text-xs">
               <div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Produtos/Itens</p>
-                <p class="font-extrabold text-slate-800">R$ ${prodSum.toFixed(2).replace('.', ',')}</p>
+                <p class="text-slate-400 font-medium mb-0.5">Produtos/itens</p>
+                <p class="font-bold text-slate-900 text-sm">R$ ${prodSum.toFixed(2).replace('.', ',')}</p>
               </div>
               <div class="text-right">
-                <p class="text-[10px] text-teal-600 font-bold uppercase">Taxas de Entrega</p>
-                <p class="font-extrabold text-teal-700">R$ ${feeSum.toFixed(2).replace('.', ',')}</p>
+                <p class="text-slate-400 font-medium mb-0.5">Taxas de entrega</p>
+                <p class="font-bold text-emerald-800 text-sm">R$ ${feeSum.toFixed(2).replace('.', ',')}</p>
               </div>
             </div>
 
+            <!-- Lista de Entregas do Motorista ou Estado Vazio -->
             ${sList.length === 0 ? `
-              <p class="text-xs text-slate-400 italic text-center py-2">Nenhuma entrega delegada a este motorista no momento.</p>
+              <div class="bg-slate-100/70 rounded-lg p-4 text-center">
+                <i class="ti ti-package-off text-xl text-slate-400 block mb-1"></i>
+                <p class="text-xs text-slate-500">Nenhuma entrega delegada a este motorista no momento.</p>
+              </div>
             ` : `
-              <div class="space-y-2 pt-1">
+              <div class="space-y-2 pt-1 border-t border-slate-100">
                 ${sList.map(s => `
                   <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
                     <div>
@@ -2298,7 +2325,7 @@
                         <span class="text-[9px] text-teal-600 font-bold block">(Taxa: R$ ${s.deliveryFee.toFixed(2).replace('.', ',')})</span>
                       </div>
                       <button onclick="openFichaModal('${s.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px] transition" title="Ver Ficha">
-                        📄 Ficha
+                        Ficha
                       </button>
                       <button onclick="toggleStatus('${s.id}', 'vendido')" class="px-2 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-md font-bold text-[10px] transition">
                         ✓ Entregue
@@ -2429,7 +2456,7 @@
                 </button>
 
                 <button onclick="openFichaModal('${s.id}')" class="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-bold transition shadow-sm bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300">
-                  📄 Ficha
+                  Ficha
                 </button>
               </div>
 
